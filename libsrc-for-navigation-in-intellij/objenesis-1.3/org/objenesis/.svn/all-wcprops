@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/svn/!svn/ver/234/trunk/main/src/org/objenesis
+END
+ObjenesisException.java
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/!svn/ver/223/trunk/main/src/org/objenesis/ObjenesisException.java
+END
+Objenesis.java
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/!svn/ver/223/trunk/main/src/org/objenesis/Objenesis.java
+END
+ObjenesisHelper.java
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/!svn/ver/223/trunk/main/src/org/objenesis/ObjenesisHelper.java
+END
+ObjenesisSerializer.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/!svn/ver/223/trunk/main/src/org/objenesis/ObjenesisSerializer.java
+END
+ObjenesisStd.java
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/!svn/ver/223/trunk/main/src/org/objenesis/ObjenesisStd.java
+END
+ObjenesisBase.java
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/223/trunk/main/src/org/objenesis/ObjenesisBase.java
+END

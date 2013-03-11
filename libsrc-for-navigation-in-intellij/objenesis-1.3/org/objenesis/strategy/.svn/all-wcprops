@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/!svn/ver/223/trunk/main/src/org/objenesis/strategy
+END
+InstantiatorStrategy.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/!svn/ver/223/trunk/main/src/org/objenesis/strategy/InstantiatorStrategy.java
+END
+SerializingInstantiatorStrategy.java
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/!svn/ver/223/trunk/main/src/org/objenesis/strategy/SerializingInstantiatorStrategy.java
+END
+StdInstantiatorStrategy.java
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/!svn/ver/223/trunk/main/src/org/objenesis/strategy/StdInstantiatorStrategy.java
+END
+BaseInstantiatorStrategy.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/!svn/ver/223/trunk/main/src/org/objenesis/strategy/BaseInstantiatorStrategy.java
+END

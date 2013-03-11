@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/!svn/ver/234/trunk/main/src/org/objenesis/instantiator
+END
+ObjectInstantiator.java
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/!svn/ver/223/trunk/main/src/org/objenesis/instantiator/ObjectInstantiator.java
+END
+NullInstantiator.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/!svn/ver/223/trunk/main/src/org/objenesis/instantiator/NullInstantiator.java
+END
+SerializationInstantiatorHelper.java
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/!svn/ver/223/trunk/main/src/org/objenesis/instantiator/SerializationInstantiatorHelper.java
+END

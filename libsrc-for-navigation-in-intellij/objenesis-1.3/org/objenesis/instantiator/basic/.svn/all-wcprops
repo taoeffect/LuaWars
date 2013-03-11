@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/223/trunk/main/src/org/objenesis/instantiator/basic
+END
+ObjectInputStreamInstantiator.java
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/!svn/ver/223/trunk/main/src/org/objenesis/instantiator/basic/ObjectInputStreamInstantiator.java
+END
+ConstructorInstantiator.java
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/!svn/ver/223/trunk/main/src/org/objenesis/instantiator/basic/ConstructorInstantiator.java
+END
+ObjectStreamClassInstantiator.java
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/!svn/ver/223/trunk/main/src/org/objenesis/instantiator/basic/ObjectStreamClassInstantiator.java
+END
+AccessibleInstantiator.java
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/!svn/ver/223/trunk/main/src/org/objenesis/instantiator/basic/AccessibleInstantiator.java
+END
+NewInstanceInstantiator.java
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/!svn/ver/223/trunk/main/src/org/objenesis/instantiator/basic/NewInstanceInstantiator.java
+END

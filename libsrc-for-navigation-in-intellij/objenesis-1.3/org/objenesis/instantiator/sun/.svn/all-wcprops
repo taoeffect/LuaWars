@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/234/trunk/main/src/org/objenesis/instantiator/sun
+END
+Sun13InstantiatorBase.java
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/!svn/ver/230/trunk/main/src/org/objenesis/instantiator/sun/Sun13InstantiatorBase.java
+END
+SunReflectionFactorySerializationInstantiator.java
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/svn/!svn/ver/234/trunk/main/src/org/objenesis/instantiator/sun/SunReflectionFactorySerializationInstantiator.java
+END
+Sun13SerializationInstantiator.java
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/!svn/ver/223/trunk/main/src/org/objenesis/instantiator/sun/Sun13SerializationInstantiator.java
+END
+SunReflectionFactoryHelper.java
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/!svn/ver/234/trunk/main/src/org/objenesis/instantiator/sun/SunReflectionFactoryHelper.java
+END
+SunReflectionFactoryInstantiator.java
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/!svn/ver/234/trunk/main/src/org/objenesis/instantiator/sun/SunReflectionFactoryInstantiator.java
+END
+Sun13Instantiator.java
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/!svn/ver/223/trunk/main/src/org/objenesis/instantiator/sun/Sun13Instantiator.java
+END
