@@ -19,8 +19,6 @@ public class Log {
         TRACE, DEBUG, INFO, WARN, ERROR
     }
 
-    private static final long START_TIME = System.currentTimeMillis();
-
     public static LEVEL   currentLevel = LEVEL.INFO;
     public static boolean showTime     = true;
     public static boolean showThread   = true;
@@ -124,15 +122,12 @@ public class Log {
 
         // Append date-time if so configured
         if (showTime) {
-            buf.append(new Date());
-            buf.append(' ');
+            buf.append(new Date()+" ");
         }
 
         // Append current thread name if so configured
         if (showThread) {
-            buf.append('[');
-            buf.append(Thread.currentThread().getName());
-            buf.append("] ");
+            buf.append('['+Thread.currentThread().getName()+"] ");
         }
 
         switch (level) {
