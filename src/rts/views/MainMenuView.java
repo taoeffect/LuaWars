@@ -1,5 +1,7 @@
 package rts.views;
 
+import java.io.IOException;
+
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -44,13 +46,19 @@ public class MainMenuView extends View {
 		w.setPosition(x, y);
 		w.setSize(300, 300);
 
-		Button networkButton = new Button("Network");
+		Button networkButton = new Button("Campaign");
 		networkButton.setPosition(50, 20);
 		networkButton.setSize(150, 40);
 		networkButton.addCallback(new Runnable() {
 			@Override
 			public void run() {
-				game.enterState(Game.NETWORK_VIEW_ID, new FadeOutTransition(), new FadeInTransition());
+                try {
+                    game.getNetworkManager().createServer();
+                    game.getNetworkManager().joinServer("localhost");
+                    game.enterState(Game.CREATE_VIEW_ID, new FadeOutTransition(), new FadeInTransition());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 			}
 		});
 		w.add(networkButton);

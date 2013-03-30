@@ -304,4 +304,40 @@ public class Configuration {
 		configurationFile.setProperty("udpListeningClientPort", port + "");
 	}
 
+    /**
+     * Get the current Profile.
+     *
+     *
+     */
+    public static String getProfile() {
+        return configurationFile.getProperty("profile", "Default");
+    }
+
+    /**
+     * Set the current Profile.
+     *
+     *  HAS TO BE THE NAME OF AN EXISTING PROFILE
+     *
+     */
+    public static void setProfile(String profile) {
+        configurationFile.setProperty("profile", profile + "");
+    }
+
+    /**
+     * Get the current profile's Progress.
+     */
+    public static int getProgress(String profile) {
+        return Integer.parseInt(configurationFile.getProperty(profile, "1"));
+    }
+
+    /**
+     * Set the current profile's Progress.
+     *
+     * CANNOT BE LARGER THAN THE AMOUNT OF MAPS IN THE GAME
+     *
+     */
+    public static void setProgress(String profile, int progress) {
+        configurationFile.setProperty(profile, progress + "");
+    }
+
 }

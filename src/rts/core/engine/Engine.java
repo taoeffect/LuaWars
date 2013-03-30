@@ -131,7 +131,7 @@ public class Engine extends View {
 		}
 		GameMusic.stopMusic();
 		GameMusic.loopMainTheme();
-		game.enterState(Game.NETWORK_VIEW_ID, new FadeOutTransition(), new FadeInTransition());
+		game.enterState(Game.CREATE_VIEW_ID, new FadeOutTransition(), new FadeInTransition());
 	}
 
 	@Override
@@ -291,10 +291,10 @@ public class Engine extends View {
 		// UPDATE MOUSE MOVE AND CLICK
 		input.update(container, gui.isMouseOnGui(container, mx, my), mx, my, -xScrollDecal, -yScrollDecal);
 
-		// Mettre à 0 le nombres d'entités
+		// Mettre ï¿½ 0 le nombres d'entitï¿½s
 		resetEntsCount();
 
-		// Mettre à jour toutes les couches
+		// Mettre ï¿½ jour toutes les couches
 		for (int i = 0; i < layers.size(); i++) {
 			layers.get(i).updateAll(container, delta);
 		}
@@ -302,7 +302,7 @@ public class Engine extends View {
 		// UPDATE CURRENT ROUND
 		rounds.get(currentRound).update(this, delta);
 
-		// Si la partie est en réseau
+		// Si la partie est en rï¿½seau
 		if (isNetwork) {
 			netManager.update();
 		}

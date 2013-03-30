@@ -184,7 +184,7 @@ public class OptionsView extends View {
 
 		root.add(w);
 
-		exitButton = new Button("Exit");
+		exitButton = new Button("Back");
 		exitButton.setSize(70, 30);
 		exitButton.setPosition(x - 350, y + 250);
 		exitButton.addCallback(new Runnable() {
