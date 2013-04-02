@@ -1,6 +1,7 @@
 package rts.core.engine;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 import org.newdawn.slick.Color;
@@ -388,6 +389,14 @@ public class Engine extends View {
 				if (!gameWin) {
 					exitTimer.resetTime();
 					gameWin = true;
+                    if (checkUnlock())                             //if it's true that the next map should be unlock, add 1 to number of unlocked maps for current profile
+                    {
+                        int k =  Configuration.getProgress(Configuration.getProfile());
+                        k++;
+                        Configuration.setProgress(Configuration.getProfile(), k);
+                        game.getStateByIndex(6).initResources();                         //update CreateView
+                        game.getStateByIndex(6).initTwlComponent();
+                    }
 				}
 			}
 		} else {
@@ -399,6 +408,28 @@ public class Engine extends View {
 			getMap().init(this);
 		}
 	}
+
+    public boolean checkUnlock()             //check if the next map should be unlocked upon gameWin
+    {
+        boolean result = false;
+
+        ArrayList<Map> maps = new ArrayList<Map>(ResourceManager.getAllMaps().values());     //maps = all maps in resources
+        Collections.sort(maps);                                                              //order of maps in CreateView (campaign menu)
+        int correctMap = 0;
+        for (int i = 0; i < maps.size(); i++)
+        {
+            if (maps.get(i).getName() == getMap().getName())
+            {
+                correctMap = i;                                                 //number of the current map as listed in CreateView
+            }
+        }
+        if(correctMap == Configuration.getProgress(Configuration.getProfile()) - 1)   //if current map is the last map that was last unlocked, result is true
+        {
+               result = true;
+        }
+
+        return result;
+    }
 
 	// Count Down
 	public void removeCountDown(CountDown countDown) {

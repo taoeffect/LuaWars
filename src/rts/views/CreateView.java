@@ -121,10 +121,13 @@ public class CreateView extends View {
 
         //remove the maps not yet unlocked by the current profile
         int delete = maps.size() - Configuration.getProgress(Configuration.getProfile());
-        while(delete != 0)
+        if (delete >= 0)
         {
-            maps.remove(maps.size() - 1);
-            delete--;
+            while(delete != 0)
+            {
+                maps.remove(maps.size() - 1);
+                delete--;
+            }
         }
 
 		netManager = game.getNetworkManager();
@@ -167,7 +170,7 @@ public class CreateView extends View {
 		launchButton.setVisible(false);
 	}
 
-	@Override
+    @Override
 	public void initTwlComponent() {
 
 		int x = container.getWidth() / 2 - 370;// 25
