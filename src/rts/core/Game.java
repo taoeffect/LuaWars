@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.AppGameContainer;
+import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
@@ -28,6 +29,8 @@ import rts.views.NetworkView;
 import rts.views.OptionsView;
 import rts.views.ResourcesView;
 import rts.views.View;
+import rts.views.TutorialView;
+import rts.views.ProfileView;
 
 /**
  * The main game class, contain the view lists and the launch process.
@@ -46,6 +49,8 @@ public class Game extends StateBasedGame {
 	public static final int CREDITS_VIEW_ID = 5;
 	public static final int ENGINE_VIEW_ID = 6;
 	public static final int CREATE_VIEW_ID = 7;
+    public static final int TUTORIAL_VIEW_ID = 8;
+    public static final int PROFILE_VIEW_ID = 9;
 
 	/**
 	 * The current name of the project.
@@ -102,6 +107,8 @@ public class Game extends StateBasedGame {
 		addState(new CreditsView());
 		addState(new Engine());
 		addState(new CreateView());
+        addState(new TutorialView());
+        addState(new ProfileView());
 
 		createTWLRenderer();
 	}
