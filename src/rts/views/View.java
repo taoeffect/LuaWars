@@ -3,6 +3,7 @@ package rts.views;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import org.luawars.Log;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
@@ -81,7 +82,9 @@ public abstract class View extends BasicGameState {
 	public void initTwl() {
 		root = new Widget();
 		root.setTheme("");
-		initTwlComponent();
+        Log.logEnterMethod(Log.DEBUG);
+        initTwlComponent();
+        Log.logExitMethod(Log.DEBUG);
 	}
 
 	/**

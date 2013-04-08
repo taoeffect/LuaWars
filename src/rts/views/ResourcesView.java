@@ -1,5 +1,6 @@
 package rts.views;
 
+import org.luawars.Log;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -38,8 +39,11 @@ public class ResourcesView extends View {
 	public ResourcesView(GameContainer container) {
 		timer = new Timer(WAIT_TIME_BEFORE_NEXTR);
 		this.container = container;
-		initTwl();
+        Log.debug(Log.me() + " initTwl...");
+        initTwl();
+        Log.debug(Log.me() + " initResources...");
 		initResources();
+        Log.debug(Log.me() + " done with ResourcesView()!");
 	}
 
 	public void initResources() {
@@ -75,15 +79,18 @@ public class ResourcesView extends View {
 		}
 	}
 
-	@Override
+    static boolean stated = false;
+    @Override
 	public void update(GameContainer container, StateBasedGame sbGame, int delta) throws SlickException {
-		super.update(container, sbGame, delta);
+        super.update(container, sbGame, delta);
 		timer.update(delta);
 		if (timer.isTimeComplete()) {
+            Log.debug(Log.me() + " ... ResourceManager.loadNextResource() ...");
 			ResourceManager.loadNextResource();
 			if (ResourceManager.isLoadComplete() && !ready) {
 				for (int i = 1; i < sbGame.getStateCount(); i++) {
 					View view = ((Game) sbGame).getStateByIndex(i);
+                    Log.debug(view.getClass().getSimpleName() + " initResources()...");
 					view.initResources();
 				}
 
@@ -93,8 +100,13 @@ public class ResourcesView extends View {
 			}
 			timer.resetTime();
 		}
-		if (bar != null)
-			bar.setValue(((float) ResourceManager.getAdvancement()) / 100);
+		if (bar != null) {
+            bar.setValue(((float) ResourceManager.getAdvancement()) / 100);
+            if (ResourceManager.getAdvancement() >= 100 && !stated) {
+                stated = true;
+                Log.warn("done loading resources!!");
+            }
+        }
 	}
 
 	@Override

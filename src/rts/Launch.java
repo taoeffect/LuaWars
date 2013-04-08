@@ -7,6 +7,8 @@ import org.newdawn.slick.SlickException;
 
 import rts.core.Game;
 
+import javax.swing.*;
+
 /**
  * Entry point to launch the game.
  * 
@@ -16,17 +18,15 @@ import rts.core.Game;
 public class Launch {
 
 	public static void main(String[] args) {
-		try {
-            if (System.getenv("DEBUG") != null)
-                Log.currentLevel = Log.LEVEL.DEBUG;
-
-			Game g = new Game("lib/resources.jar", "config/config.properties");
-			g.launch();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (SlickException e) {
-			e.printStackTrace();
-		}
-	}
+        if (System.getenv("DEBUG") != null)
+            Log.currentLevel = Log.DEBUG;
+        try {
+            new Game("lib/resources.jar", "config/config.properties").launch();
+        } catch (SlickException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+    }
 
 }

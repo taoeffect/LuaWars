@@ -3,12 +3,11 @@ package rts.core;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.luawars.Log;
+import org.luawars.gui.MainPanel;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.GL11;
-import org.newdawn.slick.AppGameContainer;
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Input;
-import org.newdawn.slick.SlickException;
+import org.newdawn.slick.*;
 import org.newdawn.slick.state.GameState;
 import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.util.InputAdapter;
@@ -28,6 +27,8 @@ import rts.views.NetworkView;
 import rts.views.OptionsView;
 import rts.views.ResourcesView;
 import rts.views.View;
+
+import javax.swing.*;
 
 /**
  * The main game class, contain the view lists and the launch process.
@@ -94,16 +95,17 @@ public class Game extends StateBasedGame {
 
 	@Override
 	public void initStatesList(GameContainer container) throws SlickException {
-
-		addState(new ResourcesView(container));
+        Log.logEnterMethod(Log.DEBUG);
+        addState(new ResourcesView(container));
 		addState(new MainMenuView());
 		addState(new NetworkView());
 		addState(new OptionsView());
 		addState(new CreditsView());
 		addState(new Engine());
 		addState(new CreateView());
-
+        Log.debug(Log.me() + " createTWLRenderer()...");
 		createTWLRenderer();
+        Log.logExitMethod(Log.DEBUG);
 	}
 
 	@Override
@@ -123,8 +125,11 @@ public class Game extends StateBasedGame {
 	 * @throws IOException
 	 */
 	public void launch() throws SlickException, IOException {
-		AppGameContainer container = new AppGameContainer(this);
-		// Mandatory
+//		AppGameContainer container = new AppGameContainer(this);
+        final CanvasGameContainer can = new CanvasGameContainer(this);
+        AppGameContainer container = (AppGameContainer)can.getContainer();
+
+        // Mandatory
 		container.setMinimumLogicUpdateInterval(10);
 		container.setMaximumLogicUpdateInterval(10);
 		container.setUpdateOnlyWhenVisible(false);
@@ -133,13 +138,54 @@ public class Game extends StateBasedGame {
 		// Apply Configuration
 		applyCurrentConfiguration(container);
 
-		// Start the game
-		container.start();
+        // set size (greg added this)
+
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                JFrame frame = new JFrame("Lua Wars");
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                MainPanel panel = new MainPanel();
+                // TODO: make it so that container.getWidth() is used instead and works
+                Log.debug("Setting container size: "+Configuration.getWidth()+"w "+Configuration.getHeight()+"h");
+                can.setSize(Configuration.getWidth(), Configuration.getHeight());
+                panel.splitPane.setRightComponent(can);
+                frame.setContentPane(panel.panel);
+                frame.pack();
+                frame.setVisible(true);
+            }
+        });
+        // Start the game
+		can.start();
+
+        // TODO: fix this exception when clicking 'Exit'
+        /*
+        AL lib: FreeDevice: (0x10fc30000) Deleting 31 Buffer(s)
+Exception in thread "AWT-EventQueue-0" java.lang.IllegalStateException: Mouse must be created before you can read events
+	at org.lwjgl.input.Mouse.next(Mouse.java:444)
+	at org.newdawn.slick.Input.poll(Input.java:1205)
+	at org.newdawn.slick.GameContainer.updateAndRender(GameContainer.java:656)
+	at org.newdawn.slick.AppGameContainer.gameLoop(AppGameContainer.java:456)
+	at org.newdawn.slick.CanvasGameContainer$2.run(CanvasGameContainer.java:100)
+	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:209)
+	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:702)
+	at java.awt.EventQueue.access$400(EventQueue.java:82)
+	at java.awt.EventQueue$2.run(EventQueue.java:663)
+	at java.awt.EventQueue$2.run(EventQueue.java:661)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.security.AccessControlContext$1.doIntersectionPrivilege(AccessControlContext.java:87)
+	at java.awt.EventQueue.dispatchEvent(EventQueue.java:672)
+	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:296)
+	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:211)
+	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:201)
+	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:196)
+	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:188)
+	at java.awt.EventDispatchThread.run(EventDispatchThread.java:122)
+         */
 	}
 
 	private void applyCurrentConfiguration(AppGameContainer container) throws IOException, SlickException {
 		Configuration.updateConfigFile();
-		container.setDisplayMode(Configuration.getWidth(), Configuration.getHeight(), Configuration.isFullScreen());
+        container.setDisplayMode(Configuration.getWidth(), Configuration.getHeight(), Configuration.isFullScreen());
 		container.setTargetFrameRate(Configuration.getTargetFPS());
 		container.setSmoothDeltas(Configuration.isSmoothDeltas());
 		container.setVSync(Configuration.isVSynch());
@@ -159,7 +205,7 @@ public class Game extends StateBasedGame {
 	 *             If the configuration loading failed.
 	 */
 	public void applyCurrentConfiguration() throws IOException, SlickException {
-		applyCurrentConfiguration((AppGameContainer) this.getContainer());
+		applyCurrentConfiguration((AppGameContainer)this.getContainer());
 	}
 
 	/**
@@ -220,10 +266,12 @@ public class Game extends StateBasedGame {
 	}
 
 	public void initAllTWLComponents() {
+        Log.logEnterMethod(Log.DEBUG);
 		// We didn't init the resource view
 		for (int i = 1; i < states.size(); i++) {
 			states.get(i).initTwl();
 		}
+        Log.logExitMethod(Log.DEBUG);
 	}
 
 	public class TWLInputAdapter extends InputAdapter {
@@ -341,7 +389,7 @@ public class Game extends StateBasedGame {
 		/**
 		 * Call this method from {@code BasicGame.update}
 		 * 
-		 * @see BasicGame#update(org.newdawn.slick.GameContainer, int)
+		 * @see StateBasedGame#update(org.newdawn.slick.GameContainer, int)
 		 */
 		public void update() {
 			gui.setSize();
@@ -355,7 +403,7 @@ public class Game extends StateBasedGame {
 		/**
 		 * Call this method from {@code BasicGame.render}
 		 * 
-		 * @see BasicGame#render(org.newdawn.slick.GameContainer,
+		 * @see StateBasedGame#render(org.newdawn.slick.GameContainer,
 		 *      org.newdawn.slick.Graphics)
 		 */
 		public void render() {

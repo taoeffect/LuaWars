@@ -19,9 +19,15 @@ public class Log {
         TRACE, DEBUG, INFO, WARN, ERROR
     }
 
-    public static LEVEL   currentLevel = LEVEL.INFO;
+    public static final LEVEL TRACE    = LEVEL.TRACE;
+    public static final LEVEL DEBUG    = LEVEL.DEBUG;
+    public static final LEVEL INFO     = LEVEL.INFO;
+    public static final LEVEL WARN     = LEVEL.WARN;
+    public static final LEVEL ERROR    = LEVEL.ERROR;
+    public static LEVEL   currentLevel = INFO;
     public static boolean showTime     = true;
     public static boolean showThread   = true;
+    
 
     private static void formatAndLog(LEVEL level, String format, Object arg1, Object arg2) {
         if (currentLevel.compareTo(level) <= 0) {
@@ -36,81 +42,102 @@ public class Log {
         }
     }
 
+    public static String me() {
+        StackTraceElement t = Thread.currentThread().getStackTrace()[2];
+        return t.getClassName()+"."+t.getMethodName()+":"+t.getLineNumber();
+    }
+    public static String me(int idx) {
+        StackTraceElement t = Thread.currentThread().getStackTrace()[2+idx];
+        return t.getClassName()+"."+t.getMethodName()+":"+t.getLineNumber();
+    }
+    public static void logEnterMethod(LEVEL l) {
+        logEnterMethod(l, 1);
+    }
+    public static void logExitMethod(LEVEL l) {
+        logExitMethod(l, 1);
+    }
+    public static void logEnterMethod(LEVEL l, int idx) {
+        log(l, me(1+idx) + "...", null);
+    }
+    public static void logExitMethod(LEVEL l, int idx) {
+        log(l, me(1+idx) + " done!", null);
+    }
+
 
     public static void trace(String msg) {
-        log(LEVEL.TRACE, msg, null);
+        log(TRACE, msg, null);
     }
     public static void trace(String format, Object param1) {
-        formatAndLog(LEVEL.TRACE, format, param1, null);
+        formatAndLog(TRACE, format, param1, null);
     }
     public static void trace(String format, Object param1, Object param2) {
-        formatAndLog(LEVEL.TRACE, format, param1, param2);
+        formatAndLog(TRACE, format, param1, param2);
     }
     public static void trace(String format, Object... argArray) {
-        formatAndLog(LEVEL.TRACE, format, argArray);
+        formatAndLog(TRACE, format, argArray);
     }
     public static void trace(String msg, Throwable t) {
-        log(LEVEL.TRACE, msg, t);
+        log(TRACE, msg, t);
     }
     public static void debug(String msg) {
-        log(LEVEL.DEBUG, msg, null);
+        log(DEBUG, msg, null);
     }
     public static void debug(String format, Object param1) {
-        formatAndLog(LEVEL.DEBUG, format, param1, null);
+        formatAndLog(DEBUG, format, param1, null);
     }
     public static void debug(String format, Object param1, Object param2) {
-        formatAndLog(LEVEL.DEBUG, format, param1, param2);
+        formatAndLog(DEBUG, format, param1, param2);
     }
     public static void debug(String format, Object... argArray) {
-        formatAndLog(LEVEL.DEBUG, format, argArray);
+        formatAndLog(DEBUG, format, argArray);
     }
     public static void debug(String msg, Throwable t) {
-        log(LEVEL.DEBUG, msg, t);
+        log(DEBUG, msg, t);
     }
     public static void info(String msg) {
-        log(LEVEL.INFO, msg, null);
+        log(INFO, msg, null);
     }
     public static void info(String format, Object arg) {
-        formatAndLog(LEVEL.INFO, format, arg, null);
+        formatAndLog(INFO, format, arg, null);
     }
     public static void info(String format, Object arg1, Object arg2) {
-        formatAndLog(LEVEL.INFO, format, arg1, arg2);
+        formatAndLog(INFO, format, arg1, arg2);
     }
     public static void info(String format, Object... argArray) {
-        formatAndLog(LEVEL.INFO, format, argArray);
+        formatAndLog(INFO, format, argArray);
     }
     public static void info(String msg, Throwable t) {
-        log(LEVEL.INFO, msg, t);
+        log(INFO, msg, t);
     }
     public static void warn(String msg) {
-        log(LEVEL.WARN, msg, null);
+        log(WARN, msg, null);
     }
     public static void warn(String format, Object arg) {
-        formatAndLog(LEVEL.WARN, format, arg, null);
+        formatAndLog(WARN, format, arg, null);
     }
     public static void warn(String format, Object arg1, Object arg2) {
-        formatAndLog(LEVEL.WARN, format, arg1, arg2);
+        formatAndLog(WARN, format, arg1, arg2);
     }
     public static void warn(String format, Object... argArray) {
-        formatAndLog(LEVEL.WARN, format, argArray);
+        formatAndLog(WARN, format, argArray);
     }
     public static void warn(String msg, Throwable t) {
-        log(LEVEL.WARN, msg, t);
+        log(WARN, msg, t);
     }
     public static void error(String msg) {
-        log(LEVEL.ERROR, msg, null);
+        log(ERROR, msg, null);
     }
     public static void error(String format, Object arg) {
-        formatAndLog(LEVEL.ERROR, format, arg, null);
+        formatAndLog(ERROR, format, arg, null);
     }
     public static void error(String format, Object arg1, Object arg2) {
-        formatAndLog(LEVEL.ERROR, format, arg1, arg2);
+        formatAndLog(ERROR, format, arg1, arg2);
     }
     public static void error(String format, Object... argArray) {
-        formatAndLog(LEVEL.ERROR, format, argArray);
+        formatAndLog(ERROR, format, argArray);
     }
     public static void error(String msg, Throwable t) {
-        log(LEVEL.ERROR, msg, t);
+        log(ERROR, msg, t);
     }
 
 
@@ -150,7 +177,7 @@ public class Log {
 
         // Append the message
         buf.append(message);
-        PrintStream out = level.compareTo(LEVEL.WARN) >= 0 ? System.err : System.out;
+        PrintStream out = level.compareTo(WARN) >= 0 ? System.err : System.out;
         out.println(buf.toString());
         out.flush();
         if (t != null) t.printStackTrace(System.err);

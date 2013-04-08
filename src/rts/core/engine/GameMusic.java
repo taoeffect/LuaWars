@@ -1,5 +1,6 @@
 package rts.core.engine;
 
+import org.luawars.Log;
 import org.newdawn.slick.Music;
 import org.newdawn.slick.MusicListener;
 import org.newdawn.slick.SlickException;
@@ -12,6 +13,7 @@ public class GameMusic {
 
 	public static void initMainTheme() {
 		try {
+			//mainTheme = new Music("resources/others/main_theme.ogg", true);
 			mainTheme = new Music("resources/others/main_theme.ogg");
 		} catch (SlickException e) {
 			e.printStackTrace();
@@ -19,9 +21,11 @@ public class GameMusic {
 	}
 
 	public static void initMusics() {
-		ResourceManager.getMusic("music_1").addListener(new GameMusicListener(2));
+        Log.logEnterMethod(Log.DEBUG);
+        ResourceManager.getMusic("music_1").addListener(new GameMusicListener(2));
 		ResourceManager.getMusic("music_2").addListener(new GameMusicListener(3));
 		ResourceManager.getMusic("music_3").addListener(new GameMusicListener(1));
+        Log.logExitMethod(Log.DEBUG);
 	}
 
 	public static void loopMainTheme() {

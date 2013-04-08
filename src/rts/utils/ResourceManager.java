@@ -19,6 +19,7 @@ import org.newdawn.slick.particles.ConfigurableEmitter;
 import org.newdawn.slick.particles.ParticleIO;
 import org.newdawn.slick.particles.ParticleSystem;
 
+import org.newdawn.slick.util.ResourceLoader;
 import rts.core.engine.map.Map;
 
 /**
@@ -132,6 +133,7 @@ public class ResourceManager {
 		if (LoadingList.get().getRemainingResources() > 0) {
 			DeferredResource nextResource = LoadingList.get().getNext();
 			try {
+                Log.debug(Log.me() + ": " + nextResource.getDescription());
 				nextResource.load();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -369,6 +371,7 @@ public class ResourceManager {
 			try {
 				ResourceManager.sprites.put(name, new SpriteSheet(name, Thread.currentThread().getContextClassLoader().getResourceAsStream(path), tileWidth,
 						tileHeight));
+                //ResourceManager.sprites.put(name, new SpriteSheet(name, ResourceLoader.getResourceAsStream(path), tileWidth, tileHeight));
 			} catch (SlickException e) {
 				e.printStackTrace();
 			}
@@ -416,7 +419,8 @@ public class ResourceManager {
 
 		public void load() throws IOException {
 			try {
-				ResourceManager.musics.put(name, new Music(path));
+				//ResourceManager.musics.put(name, new Music(path, true));
+                ResourceManager.musics.put(name, new Music(path));
 			} catch (SlickException e) {
 				e.printStackTrace();
 			}
