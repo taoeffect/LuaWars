@@ -103,6 +103,7 @@ public final class Utils {
 		return array.get(0);
 	}
 
+    // closer point for single entity
 	public static Point getCloserPoint(Map map, MoveableEntity ent, int mx, int my) {
 		int check = 0;
 		int depth = 1;
@@ -116,25 +117,26 @@ public final class Utils {
 			}
 			x = mx + DIRECTIONS[check][0] * depth;
 			y = my + DIRECTIONS[check][1] * depth;
-			check++;
+            check++;
 		}
 		return array.get(0);
 	}
 
+    // find points for multiple entities
 	public static ArrayList<Point> getCloserPoints(Map map, ArrayList<MoveableEntity> ents, int mx, int my) {
 		ArrayList<Point> array = new ArrayList<Point>();
 		for (int i = 0; i < ents.size(); i++) {
 			MoveableEntity me = ents.get(i);
 			int check = 0;
 			int depth = 1;
-			int x = mx;
+            int x = mx;
 			int y = my;
 			while (!findPoint(me, map, array, x, y)) {
 				if (check == 8) {
 					depth++;
 					check = 0;
 				}
-				x = mx + DIRECTIONS[check][0] * depth;
+                x = mx + DIRECTIONS[check][0] * depth;
 				y = my + DIRECTIONS[check][1] * depth;
 				check++;
 			}
@@ -142,22 +144,30 @@ public final class Utils {
 		return array;
 	}
 
+    // sees if the x, y location is in our point array
 	private static boolean findPoint(MoveableEntity me, Map map, ArrayList<Point> array, int x, int y) {
+        // find the first direction from x, y that is not in our array and add it to our array
 		for (int j = 0; j < 8; j++) {
+            // if the location + direction is not blocked by an obstacle or water or anything
 			if (!map.blocked(me, x + DIRECTIONS[j][0], y + DIRECTIONS[j][1])) {
 				boolean contain = false;
+                // check if the new location is in our array
 				for (int k = 0; k < array.size(); k++) {
 					if (array.get(k).x == x + DIRECTIONS[j][0] && array.get(k).y == y + DIRECTIONS[j][1]) {
+                        // if our array contains the point
 						contain = true;
 						break;
 					}
 				}
+                // if our point is not in the array, add it
 				if (!contain) {
 					// find
 					array.add(new Point(x + DIRECTIONS[j][0], y + DIRECTIONS[j][1]));
 					return true;
 				}
 			}
+            else {
+            }
 		}
 		return false;
 	}

@@ -63,6 +63,8 @@ public class PlayerInput {
 		}
 	}
 
+    // mx and my determine where the mouse is on the current screen
+    // decX and decY determine where the screen is relative to the game map
 	public void update(GameContainer container, boolean onGui, int mx, int my, int decX, int decY) throws SlickException {
 		// Get Selected
 		selected.clear();
@@ -76,14 +78,16 @@ public class PlayerInput {
 		updateMouse(container, onGui, mx, my, decX, decY);
 	}
 
+    // here might allow us to select items or move them
 	private void updateMouse(GameContainer container, boolean onGui, int mx, int my, int decX, int decY) {
 		if (engine.isMouseRightPressed() && !onGui) {
 			if (engine.getGui().isSellMod()) {
 				sellBuilding(mx + decX, my + decY);
-			} else {
-				if (engine.getGui().isRepairMod()) {
+            // note i changed the structure of these if/else statements
+            // to be less confusing
+			} else if (engine.getGui().isRepairMod()) {
 					repairBuilding(mx + decX, my + decY);
-				} else
+			} else {
 					moveOrSpecialAction(mx + decX, my + decY);
 			}
 		} else {
@@ -108,11 +112,11 @@ public class PlayerInput {
 	public void moveOrSpecialAction(int mx, int my) {
 		ActiveEntity e = engine.getEntityAt(null, mx, my);
 		if (e != null && !(engine.getMap().isEnableFow() && engine.getMap().fogOn(mx / engine.getTileW(), my / engine.getTileH()))) {
-			if (!selected.isEmpty() && e instanceof ActiveEntity) {
+            if (!selected.isEmpty() && e instanceof ActiveEntity) {
 				if (selected.size() == 1) {
 					selected.get(0).target((ActiveEntity) e, mx / engine.getTileW(), my / engine.getTileH());
 				} else {
-					// All entity target !
+					// All entSystemity target !
 					ArrayList<Point> points = Utils.getCloserPoints(engine.getMap(), movers, mx / engine.getTileW(), my / engine.getTileH());
 
 					int counter = 0;
@@ -138,8 +142,9 @@ public class PlayerInput {
 					} else
 						movers.get(0).moveFromPlayerAction(mx, my);
 				} else {
-					// Plusieurs entités, il faut regrouper des points à
-					// proximité
+					// Plusieurs entitï¿½s, il faut regrouper des points ï¿½
+					// proximitï¿½
+                    //this is how it determines how to move unit
 					ArrayList<Point> points = Utils.getCloserPoints(engine.getMap(), movers, mx / engine.getTileW(), my / engine.getTileH());
 
 					for (int i = 0; i < movers.size(); i++) {
@@ -154,16 +159,19 @@ public class PlayerInput {
 		}
 	}
 
+    // used to select units
 	private void selectAction(GameContainer container, boolean onGui, int mx, int my, int decX, int decY) {
-		if (container.getInput().isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
-			if (!pressedLeft) {
+		// first mouse click, after this, player can drag to select units with select box
+        if (container.getInput().isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
+            if (!pressedLeft) {
 				pressedX = mx;
 				pressedY = my;
 				pressedLeft = true;
 			}
-		} else {
-			if (pressedLeft) {
-				if (Math.abs(pressedX - mx) < SINGLE_SELECTION_LIMIT && Math.abs(pressedY - my) < SINGLE_SELECTION_LIMIT && !onGui) {
+        // when player releases the mouse, it selects the units inside select box
+        // changed the if statement, but it's pretty much the same
+		} else if (pressedLeft) {
+                if (Math.abs(pressedX - mx) < SINGLE_SELECTION_LIMIT && Math.abs(pressedY - my) < SINGLE_SELECTION_LIMIT && !onGui) {
 					ActiveEntity e = engine.getEntityAt(null, mx + decX, my + decY);
 					if (e != null) {
 						if (!e.isSelected())
@@ -178,9 +186,15 @@ public class PlayerInput {
 					engine.selectEntitiesBetween(pressedX, pressedY, mx, my);
 				}
 				pressedLeft = false;
-			}
 		}
 	}
+
+    // TRUNG NGUYEN'S SELECT ACTION FOR LUA
+    public void selectUnitsAt(int mx, int my, int numUnits) {
+        engine.deselectAllEntities();
+        // Select severals entities
+        engine.selectClosestEntities(mx, my, numUnits);
+    }
 
 	private void updateKey(GameContainer container) {
 		if (container.getInput().isKeyPressed(Input.KEY_TAB))
@@ -196,6 +210,7 @@ public class PlayerInput {
 		}
 	}
 
+    // looks important too
 	public void renderCursor(GameContainer container, Graphics g, boolean onGui) {
 		int mx = container.getInput().getMouseX();
 		int my = container.getInput().getMouseY();
@@ -217,6 +232,7 @@ public class PlayerInput {
 
 	}
 
+    // looks pretty important
 	private int selectCursor(ActiveEntity firstSelected, int mx, int my) {
 		for (int i = 0; i < selected.size(); i++) {
 			int c = selected.get(i).getTargetCursor(engine.getEntityAt(null, mx, my), mx, my);

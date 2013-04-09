@@ -83,23 +83,25 @@ public class GuiButton {
 	}
 
 	public void launchCreateEntityProcess() {
-		if (!processList.isEmpty()) {
-			if (processList.get(0).ready) {
-				building = (Building) EntityGenerator.createActiveEntityNoNetwork(engine, entType, 0, 0);
-			} else {
-				if (processList.get(0).pause) {
-					processList.get(0).pause = false;
-				} else {
-					panel.addButtonToWait(this);
-					if (!limitAtOne)
-						processList.add(new CreateEntityProcess());
-				}
-			}
-		} else {
-			GameSound.construction();
-			panel.addButtonToWait(this);
-			processList.add(new CreateEntityProcess());
-		}
+		if(enable) {
+                if (!processList.isEmpty()) {
+                if (processList.get(0).ready) {
+                    building = (Building) EntityGenerator.createActiveEntityNoNetwork(engine, entType, 0, 0);
+                } else {
+                    if (processList.get(0).pause) {
+                        processList.get(0).pause = false;
+                    } else {
+                        panel.addButtonToWait(this);
+                        if (!limitAtOne)
+                            processList.add(new CreateEntityProcess());
+                    }
+                }
+            } else {
+                GameSound.construction();
+                panel.addButtonToWait(this);
+                processList.add(new CreateEntityProcess());
+            }
+        }
 	}
 
 	public boolean isMouseOver(int mx, int my) {
@@ -442,7 +444,14 @@ public class GuiButton {
 		this.enable = alwaysEnable;
 	}
 
-	private class CreateEntityProcess {
+    @Override
+    public String toString() {
+        return "GuiButton{" +
+                "name='" + name + '\'' +
+                '}';
+    }
+
+    private class CreateEntityProcess {
 
 		private Timer timer;
 		private int price;

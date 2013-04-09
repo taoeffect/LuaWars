@@ -60,6 +60,7 @@ public abstract class MoveableEntity extends ActiveEntity implements Mover {
 
 	protected abstract boolean canGoToTransport(ActiveEntity target);
 
+    // single unit calls this
 	@Override
 	public void target(ActiveEntity target, int mx, int my) {
 		if (visible) {
@@ -246,7 +247,7 @@ public abstract class MoveableEntity extends ActiveEntity implements Mover {
 
 				locationCorrect = true;
 
-				// On libère la case précédente
+				// On libï¿½re la case prï¿½cï¿½dente
 				engine.getMap().removeEntityLocation(this, path.getStep(pathNumber - 1).getX(), path.getStep(pathNumber - 1).getY());
 				locations.remove(new Point(path.getStep(pathNumber - 1).getX(), path.getStep(pathNumber - 1).getY()));
 
