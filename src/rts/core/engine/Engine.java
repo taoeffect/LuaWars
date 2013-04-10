@@ -1,5 +1,6 @@
 package rts.core.engine;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -132,33 +133,91 @@ public class Engine extends View {
 		}
 		GameMusic.stopMusic();
 		GameMusic.loopMainTheme();
-		game.enterState(Game.CREATE_VIEW_ID, new FadeOutTransition(), new FadeInTransition());
+        try {
+            game.getNetworkManager().createServer();
+            game.getNetworkManager().joinServer("localhost");
+            game.enterState(Game.CREATE_VIEW_ID, new FadeOutTransition(), new FadeInTransition());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 	}
+
+    public void mainMenu() {
+        if (isNetwork) {
+            netManager.stopClient();
+            if (netManager.isServer()) {
+                netManager.stopServer();
+            }
+        }
+        GameMusic.stopMusic();
+        GameMusic.loopMainTheme();
+        game.enterState(Game.MAIN_MENU_VIEW_ID, new FadeOutTransition(), new FadeInTransition());
+    }
+
+    public void tutorialMenu() {
+        if (isNetwork) {
+            netManager.stopClient();
+            if (netManager.isServer()) {
+                netManager.stopServer();
+            }
+        }
+        GameMusic.stopMusic();
+        GameMusic.loopMainTheme();
+        try {
+            game.getNetworkManager().createServer();
+            game.getNetworkManager().joinServer("localhost");
+            game.enterState(Game.TUTORIAL_VIEW_ID, new FadeOutTransition(), new FadeInTransition());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 	@Override
 	public void initTwlComponent() {
 		igmWidget = new Widget();
-		igmWidget.setSize(220, 70);
+		igmWidget.setSize(200, 220);
 		igmWidget.setPosition(container.getWidth() / 2 - 110, container.getHeight() / 2 - 35);
 
-		Label label = new Label("Do you really want to exit ?");
-		label.setPosition(20, 20);
+		Label label = new Label("Exit");
+		label.setPosition(85, 20);
 		igmWidget.add(label);
 
-		Button yesButton = new Button("Yes");
-		yesButton.setSize(30, 20);
-		yesButton.setPosition(20, 35);
-		yesButton.addCallback(new Runnable() {
-			@Override
-			public void run() {
-				exit();
-			}
-		});
-		igmWidget.add(yesButton);
+		Button mainButton = new Button("Main Menu");
+        mainButton.setSize(100, 20);
+        mainButton.setPosition(30, 45);
+        mainButton.addCallback(new Runnable() {
+            @Override
+            public void run() {
+                mainMenu();
+            }
+        });
+        igmWidget.add(mainButton);
 
-		Button noButton = new Button("No");
-		noButton.setSize(30, 20);
-		noButton.setPosition(120, 35);
+        Button yesButton = new Button("Campaign Menu");
+        yesButton.setSize(100, 20);
+        yesButton.setPosition(30, 85);
+        yesButton.addCallback(new Runnable() {
+            @Override
+            public void run() {
+                exit();
+            }
+        });
+        igmWidget.add(yesButton);
+
+        Button tutorialButton = new Button("Tutorial Menu");
+        tutorialButton.setSize(100, 20);
+        tutorialButton.setPosition(30, 125);
+        tutorialButton.addCallback(new Runnable() {
+            @Override
+            public void run() {
+                tutorialMenu();
+            }
+        });
+        igmWidget.add(tutorialButton);
+
+		Button noButton = new Button("Cancel");
+		noButton.setSize(100, 20);
+		noButton.setPosition(30, 165);
 		noButton.addCallback(new Runnable() {
 			@Override
 			public void run() {

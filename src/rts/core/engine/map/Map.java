@@ -411,7 +411,7 @@ public class Map extends TiledMap implements TileBasedMap, Comparable<Map> {
 
 	@Override
 	public String toString() {
-		return "[" + spawns.size() + " Players] " + name;
+		return "[" + (spawns.size() - 1) + " Opponents] " + name;
 	}
 
 	private static class Ent {

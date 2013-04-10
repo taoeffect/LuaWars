@@ -1,5 +1,6 @@
 package rts.views;
 
+import java.io.IOException;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
@@ -54,7 +55,7 @@ public class MainMenuView extends View {
                // try {
                    // game.getNetworkManager().createServer();
                     //game.getNetworkManager().joinServer("localhost");
-               game.enterState(Game.PROFILE_VIEW_ID, new FadeOutTransition(), new FadeInTransition());
+               game.enterState(Game.CREATE_VIEW_ID, new FadeOutTransition(), new FadeInTransition());
                 //} catch (IOException e) {
                 //    e.printStackTrace();
                 //}
@@ -62,13 +63,19 @@ public class MainMenuView extends View {
         });
         w.add(networkButton);
 
-        Button tutorialButton = new Button("Tutorial");             //Tutorial Button
+        Button tutorialButton = new Button("Training");             //Tutorial Button
         tutorialButton.setPosition(50, 90);
         tutorialButton.setSize(150, 40);
         tutorialButton.addCallback(new Runnable() {
             @Override
             public void run() {
-                game.enterState(Game.TUTORIAL_VIEW_ID, new FadeOutTransition(), new FadeInTransition());
+                 try {
+                 game.getNetworkManager().createServer();
+                 game.getNetworkManager().joinServer("localhost");
+                 game.enterState(Game.TUTORIAL_VIEW_ID, new FadeOutTransition(), new FadeInTransition());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
         w.add(tutorialButton);
