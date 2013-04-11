@@ -83,25 +83,23 @@ public class GuiButton {
 	}
 
 	public void launchCreateEntityProcess() {
-		if(enable) {
-                if (!processList.isEmpty()) {
-                if (processList.get(0).ready) {
-                    building = (Building) EntityGenerator.createActiveEntityNoNetwork(engine, entType, 0, 0);
-                } else {
-                    if (processList.get(0).pause) {
-                        processList.get(0).pause = false;
-                    } else {
-                        panel.addButtonToWait(this);
-                        if (!limitAtOne)
-                            processList.add(new CreateEntityProcess());
-                    }
-                }
-            } else {
-                GameSound.construction();
-                panel.addButtonToWait(this);
-                processList.add(new CreateEntityProcess());
-            }
-        }
+		if (!processList.isEmpty()) {
+			if (processList.get(0).ready) {
+				building = (Building) EntityGenerator.createActiveEntityNoNetwork(engine, entType, 0, 0);
+			} else {
+				if (processList.get(0).pause) {
+					processList.get(0).pause = false;
+				} else {
+					panel.addButtonToWait(this);
+					if (!limitAtOne)
+						processList.add(new CreateEntityProcess());
+				}
+			}
+		} else {
+			GameSound.construction();
+			panel.addButtonToWait(this);
+			processList.add(new CreateEntityProcess());
+		}
 	}
 
 	public boolean isMouseOver(int mx, int my) {
@@ -287,6 +285,52 @@ public class GuiButton {
 		return checkProcess(delta);
 	}
 
+
+    public void placeBuilding(int x, int y) {
+        if (visible && building != null && building.isValidLocation(x, y)) {
+            Player player = engine.getPlayer();
+            if (engine.isNetwork()) {
+                if (building instanceof Wall) {
+                    ArrayList<Point> a = ((Wall) building).getOthersValidLocation();
+                    for (int i = 0; i < a.size(); i++) {
+                        engine.getNetworkManager().sendCreateEntity(entType, player.getId(), player.getTeamId(), a.get(i).x * engine.getTileW(),
+                                a.get(i).y * engine.getTileH());
+                    }
+                }
+                engine.getNetworkManager().sendCreateEntity(entType, player.getId(), player.getTeamId(), x * engine.getTileW(), y * engine.getTileH());
+            } else {
+                ActiveEntity ae = EntityGenerator.createActiveEntityNoNetwork(engine, entType, player.getId(), player.getTeamId());
+                ae.setLocation(x * engine.getTileW(), y * engine.getTileH());
+                if (ae instanceof BuildingECreator) {
+                    ((BuildingECreator) ae).checkPrimary();
+                } else {
+                    if (ae instanceof Wall) {
+                        ArrayList<Point> a = ((Wall) ae).getOthersValidLocation();
+                        for (int i = 0; i < a.size(); i++) {
+                            ActiveEntity w = EntityGenerator.createActiveEntityNoNetwork(engine, entType, player.getId(), player.getTeamId());
+                            w.setLocation(a.get(i).x * engine.getTileW(), a.get(i).y * engine.getTileH());
+                            engine.addEntity(w);
+                        }
+                    }
+                }
+                engine.addEntity(ae);
+
+                // Special case type = refinery = + 1 collector
+                if (entType == EData.BUILDING_REFINERY) {
+                    Point p2 = Utils.getCloserPoint(engine.getMap(), x, y);
+                    if (p2 != null) {
+                        ae = EntityGenerator.createActiveEntityNoNetwork(engine, EData.MOVER_COLLECTOR, player.getId(), player.getTeamId());
+                        ae.setLocation(p2.x * engine.getTileW(), p2.y * engine.getTileH());
+                        engine.addEntity(ae);
+                    }
+                }
+            }
+            engine.getGui().addEntityToBuildingList(entType);
+            processList.remove(0);
+            building = null;
+        }
+    }
+
 	private boolean checkProcess(int delta) {
 		if (!processList.isEmpty()) {
 			processList.get(0).update(delta);
@@ -444,14 +488,7 @@ public class GuiButton {
 		this.enable = alwaysEnable;
 	}
 
-    @Override
-    public String toString() {
-        return "GuiButton{" +
-                "name='" + name + '\'' +
-                '}';
-    }
-
-    private class CreateEntityProcess {
+	private class CreateEntityProcess {
 
 		private Timer timer;
 		private int price;

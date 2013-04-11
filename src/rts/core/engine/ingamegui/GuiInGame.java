@@ -67,8 +67,12 @@ public class GuiInGame {
                     Log.trace("attempting to call script function createUnit");
                     CallLua.callFunction("createUnit", LuaInteger.valueOf(message.charAt(message.length() - 2) - '0'), LuaInteger.valueOf(message.charAt(message.length() - 1) - '0'));
                 } else if(message.contains("call new script")){
-                    Log.trace("attempting to call new script ");
+                    Log.trace("attempting to call new script");
                     CallLua.runScript("resources/Lua Scripts/newScript.lua");
+                } else if(message.contains("get global")){
+                    Log.trace("attempting to get global variable");
+                    System.out.println("attempting to get global variable");
+                    CallLua.callFunction("getGlobal", LuaString.valueOf("baseX"));
                 } else if(message.contains("select units ")){
                     Log.trace("trying to select units");
                     CallLua.callFunction("selectUnits", LuaInteger.valueOf(0), LuaInteger.valueOf(0), LuaInteger.valueOf(message.charAt(message.length() - 1) - '0'));

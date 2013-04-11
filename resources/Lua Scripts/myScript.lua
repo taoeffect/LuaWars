@@ -17,3 +17,11 @@ end
 function moveOrSpecialAction(xLoc, yLoc)
     CallLua.moveOrSpecialAction(xLoc, yLoc)
 end
+
+function getGlobal(globalVarName)
+    -- note that the function names are not the same as the other functions are
+    -- i thought that this name (getLuaJGlobal) provided more clarity for the name
+    -- but that it was redundant in lua code
+    print(CallLua.getLuaJGlobal(globalVarName))
+    return CallLua.getLuaJGlobal(globalVarName)
+end

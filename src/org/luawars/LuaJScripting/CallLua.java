@@ -1,6 +1,7 @@
 package org.luawars.LuaJScripting;
 
 import org.luaj.vm2.*;
+import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.ThreeArgFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
 import org.luaj.vm2.lib.jse.*;
@@ -46,6 +47,7 @@ public class CallLua extends TwoArgFunction {
         library.set("createUnit", new createUnit());
         library.set("selectUnits", new selectUnits());
         library.set("moveOrSpecialAction", new moveOrSpecialAction());
+        library.set("getLuaJGlobal", new getLuaJGlobal());
         env.set("org.luawars.LuaJScripting.CallLua", library);
         return library;
     }
@@ -136,12 +138,12 @@ public class CallLua extends TwoArgFunction {
      * To create a method for Lua to call, we create a static class that extends a LuaFunction (e.g. OneArgFunction,
      * TwoArgFunction, etc). Then we implement the call function.
      */
-    public static class createUnit extends TwoArgFunction{
+    public static class createUnit extends TwoArgFunction {
         public LuaValue call(LuaValue panelId, LuaValue buttonNum) {
             Log.trace("calling createUnit function with panelId {}, buttonNum {}", panelId, buttonNum);
 
             ArrayList<GuiPanel> panels = Launch.g.getEngine().getGui().getMenuGui().getPanels();
-            if(panelId.toint() >= 0 && panelId.toint() < panels.size()) {
+            if(panelId.toint() >= 0 && panelId.toint() < panels.size()){
 
                 ArrayList<GuiButton> buttons = panels.get(panelId.toint()).getButtons();
                 if(buttonNum.toint() >= 0 && buttonNum.toint() < buttons.size()) {
@@ -159,7 +161,7 @@ public class CallLua extends TwoArgFunction {
         }
     }
 
-    public static class selectUnits extends ThreeArgFunction{
+    public static class selectUnits extends ThreeArgFunction {
         public LuaValue call(LuaValue xLoc, LuaValue yLoc, LuaValue numUnits) {
             Launch.g.getEngine().getInput().selectUnitsAt(xLoc.toint(), yLoc.toint(), numUnits.toint());
             return NIL;
@@ -167,9 +169,19 @@ public class CallLua extends TwoArgFunction {
     }
 
     // make sure calls aren't out of bounds
-    public static class moveOrSpecialAction extends TwoArgFunction{
+    public static class moveOrSpecialAction extends TwoArgFunction {
         public LuaValue call(LuaValue xLoc, LuaValue yLoc) {
             Launch.g.getEngine().getInput().moveOrSpecialAction(xLoc.toint(), yLoc.toint());
+            return NIL;
+        }
+    }
+
+    public static class getLuaJGlobal extends OneArgFunction {
+        public LuaValue call(LuaValue globalVarName) {
+            if(LuaJGlobal.luaJGlobal.get(globalVarName.tojstring()) != null)
+            {
+                return LuaValue.valueOf(LuaJGlobal.luaJGlobal.get(globalVarName.tojstring()).intValue());
+            }
             return NIL;
         }
     }
