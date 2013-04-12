@@ -25,3 +25,7 @@ function getGlobal(globalVarName)
     print(CallLua.getLuaJGlobal(globalVarName))
     return CallLua.getLuaJGlobal(globalVarName)
 end
+
+function placeBuilding(xLoc, yLoc)
+    CallLua.placeBuilding(xLoc, yLoc)
+end

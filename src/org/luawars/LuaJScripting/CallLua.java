@@ -48,6 +48,7 @@ public class CallLua extends TwoArgFunction {
         library.set("selectUnits", new selectUnits());
         library.set("moveOrSpecialAction", new moveOrSpecialAction());
         library.set("getLuaJGlobal", new getLuaJGlobal());
+        library.set("placeBuilding", new placeBuilding());
         env.set("org.luawars.LuaJScripting.CallLua", library);
         return library;
     }
@@ -181,6 +182,25 @@ public class CallLua extends TwoArgFunction {
             if(LuaJGlobal.luaJGlobal.get(globalVarName.tojstring()) != null)
             {
                 return LuaValue.valueOf(LuaJGlobal.luaJGlobal.get(globalVarName.tojstring()).intValue());
+            }
+            return NIL;
+        }
+    }
+
+    // for now see if i can just place building
+    // but i'll probably have to extend it to use 4 arguments, panel and building
+    public static class placeBuilding extends TwoArgFunction {
+        public LuaValue call(LuaValue xLoc, LuaValue yLoc) {
+            ArrayList<GuiPanel> panels = Launch.g.getEngine().getGui().getMenuGui().getPanels();
+            OUTERLOOP:
+            for(GuiPanel panel : panels) {
+                ArrayList<GuiButton> buttons = panel.getButtons();
+                for(GuiButton button : buttons) {
+                    if(button.placeBuilding(xLoc.toint(), yLoc.toint()))
+                    {
+                        break OUTERLOOP;
+                    }
+                }
             }
             return NIL;
         }
