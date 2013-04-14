@@ -1,10 +1,13 @@
 package org.luawars.LuaJScripting;
 
 import org.luaj.vm2.*;
+import org.luaj.vm2.ast.Chunk;
 import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.ThreeArgFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
 import org.luaj.vm2.lib.jse.*;
+import org.luaj.vm2.parser.LuaParser;
+import org.luaj.vm2.parser.ParseException;
 import org.luawars.Log;
 import org.newdawn.slick.KeyListener;
 import rts.Launch;
@@ -12,6 +15,8 @@ import rts.core.engine.ingamegui.GuiButton;
 import rts.core.engine.ingamegui.GuiPanel;
 import rts.core.engine.ingamegui.GuiPanelFactory;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 /**
@@ -23,6 +28,26 @@ import java.util.ArrayList;
  *
  * This class is an interface between Lua and Java. The code in this class mainly interacts
  * with static global variables in the LuaJGlobal.java file.
+ *
+ * @TODO
+ * attack/target
+ * setting up base
+ * set priorities
+ * timing
+ * selecting specific units
+ *
+ * IMPORTANT STUFF TO NOTE:
+ * - If you want to access pretty much anything in the game, I made a static variable, g, in Launch.java.
+ * With this you can access pretty much anything in the game, e.g. the engine, gui stuff, anything else.
+ * Just do something like:
+ * Launch.g.getEngine().whatever else
+ *
+ * - Also, if you want to create a new function, create a static class (you'll see plenty of examples in here)
+ * And add it to the CallLua.call() (just copy previous examples in the function).
+ * Then you can call the function in your lua script.
+ *
+ * - I've been testing everything in GuiInGame.java in the keyPressed() function. You can turn it on by pressing 'y'
+ * and submit the command by pressing enter.
  */
 public class CallLua extends TwoArgFunction {
     public static Globals G = JsePlatform.standardGlobals();
@@ -32,7 +57,7 @@ public class CallLua extends TwoArgFunction {
     /**
      * When the code:
      * require 'org.luawars.LuaJScripting.CallLua'
-     * is called in Lua, this function is called.
+     * is called in Lua in myScript.lua, this function is called.
      * This function in turn sets up all the functions that are interfaced between Lua and Java.
      * @param modName - module name
      * @param env
@@ -46,10 +71,12 @@ public class CallLua extends TwoArgFunction {
         // if you want to add functions, add them to the library
         library.set("createUnit", new createUnit());
         library.set("selectUnits", new selectUnits());
+        library.set("deselectUnits", new deselectUnits());
         library.set("moveOrSpecialAction", new moveOrSpecialAction());
         library.set("getLuaJGlobal", new getLuaJGlobal());
         library.set("placeBuilding", new placeBuilding());
         env.set("org.luawars.LuaJScripting.CallLua", library);
+
         return library;
     }
 
@@ -72,9 +99,34 @@ public class CallLua extends TwoArgFunction {
      * @param scriptFileName - script to run
      * @return
      */
-    public static LuaValue runScript(String scriptFileName) {
-        Log.debug("running script {}", scriptFileName);
-        return G.loadFile(scriptFileName).call();
+    public static LuaValue runScript(String scriptFileName, String folderPath) {
+        Log.trace("running script {}", scriptFileName);
+        try {
+            if(folderPath == null) {
+                folderPath = "resources/Lua Scripts/";
+            }
+
+            String tempScriptFileName = scriptFileName;
+            // if it ends with .lua, then get rid of the .lua part
+            if(scriptFileName.endsWith(".lua")) {
+                tempScriptFileName = scriptFileName.substring(0, scriptFileName.length() - 4);
+            }
+            System.out.println("opening file " + tempScriptFileName);
+            // to see how to use lua parser look at this
+            //https://github.com/headius/luaj/blob/master/README.html
+            // scroll down to parser section
+            LuaParser parser = new LuaParser(new FileInputStream(folderPath + tempScriptFileName + ".lua"));
+            Chunk chunk = parser.Chunk();
+            return G.loadFile(folderPath + tempScriptFileName + ".lua").call();
+            // if we want our game to put anything, then put error message displays here
+        } catch(FileNotFoundException e) {
+            System.out.println("FILE NOT FOUND");
+        } catch(ParseException e) {
+            System.out.println("PARSE FAILED: " + e);
+        } catch(LuaError e) {
+            System.out.println("LUA ERROR: " + e);
+        }
+        return NIL;
     }
 
     // create more call functions to support more arg nums?
@@ -82,6 +134,8 @@ public class CallLua extends TwoArgFunction {
     /**
      * After the script has been run, you can call functions using this method.
      * Note that runScript must be called before you can use this.
+     * IF YOU'RE READING THIS SOURCE CODE, YOU DON'T REALLY NEED THESE TO WRITE YOUR LUA SCRIPTS.
+     * THESE FUNCTIONS ARE ONLY IF YOU WANT TO CALL FUNCTIONS FROM LUA CODE IN YOUR JAVA CODE.
      * @param functionName
      * @param arg
      * @return
@@ -106,6 +160,8 @@ public class CallLua extends TwoArgFunction {
     /**
      * Allows you to call a Lua function in a script without having to call runScript before (although internally,
      * it is just calling the script before you call the Lua function).
+     * IF YOU'RE READING THIS SOURCE CODE, YOU DON'T REALLY NEED THESE TO WRITE YOUR LUA SCRIPTS.
+     * THESE FUNCTIONS ARE ONLY IF YOU WANT TO CALL FUNCTIONS FROM LUA CODE IN YOUR JAVA CODE.
      *
      * @param scriptFileName
      * @param functionName
@@ -138,6 +194,9 @@ public class CallLua extends TwoArgFunction {
     /**
      * To create a method for Lua to call, we create a static class that extends a LuaFunction (e.g. OneArgFunction,
      * TwoArgFunction, etc). Then we implement the call function.
+     *
+     * NOTE: I ALSO MADE A SevenArgFunction class. You can use this if you need to create a function with more than
+     * 3 arguments instead of using VarArgFunction.
      */
     public static class createUnit extends TwoArgFunction {
         public LuaValue call(LuaValue panelId, LuaValue buttonNum) {
@@ -162,17 +221,31 @@ public class CallLua extends TwoArgFunction {
         }
     }
 
-    public static class selectUnits extends ThreeArgFunction {
-        public LuaValue call(LuaValue xLoc, LuaValue yLoc, LuaValue numUnits) {
-            Launch.g.getEngine().getInput().selectUnitsAt(xLoc.toint(), yLoc.toint(), numUnits.toint());
+    public static class selectUnits extends SevenArgFunction {
+        public LuaValue call(LuaValue tileX, LuaValue tileY, LuaValue radius, LuaValue numUnits, LuaValue NIL0, LuaValue NIL1, LuaValue NIL2) {
+            System.out.println("running java.selectUnits()");
+            // make it return a list of the selected units
+            // right now selectUnitsAt returns an arraylist of active entities
+            // might need to convert them into a lua list
+            System.out.println(Launch.g.getEngine().getInput().selectUnitsAt(tileX.toint(), tileY.toint(), radius.tofloat(), numUnits.toint()));
             return NIL;
         }
     }
 
-    // make sure calls aren't out of bounds
+    public static class deselectUnits extends SevenArgFunction {
+        public LuaValue call(LuaValue NIL0, LuaValue NIL1, LuaValue NIL2, LuaValue NIL3, LuaValue NIL4, LuaValue NIL5, LuaValue NIL6) {
+            Launch.g.getEngine().deselectAllEntities();
+            return NIL;
+        }
+    }
+
     public static class moveOrSpecialAction extends TwoArgFunction {
-        public LuaValue call(LuaValue xLoc, LuaValue yLoc) {
-            Launch.g.getEngine().getInput().moveOrSpecialAction(xLoc.toint(), yLoc.toint());
+        // the lua version takes in tile coordinates
+        // however moveOrSpecialAction takes in x, y coordinates (i.e. pixel coordinates)
+        // so we need to convert the tiles to pixel coordinates
+        public LuaValue call(LuaValue tileX, LuaValue tileY) {
+            System.out.println("running java.moveUnits()");
+            Launch.g.getEngine().getInput().moveOrSpecialAction(tileX.toint() * Launch.g.getEngine().getTileW(), tileY.toint() * Launch.g.getEngine().getTileH());
             return NIL;
         }
     }
@@ -187,8 +260,9 @@ public class CallLua extends TwoArgFunction {
         }
     }
 
-    // for now see if i can just place building
-    // but i'll probably have to extend it to use 4 arguments, panel and building
+    // right now it places the first building it finds (from the panels)
+    // even if you have both a building (from panel 0) and a wall (from panel 2) to place.
+    // I might need to extend it to use 4 arguments, panel and building, but for now, I'll leave it
     public static class placeBuilding extends TwoArgFunction {
         public LuaValue call(LuaValue xLoc, LuaValue yLoc) {
             ArrayList<GuiPanel> panels = Launch.g.getEngine().getGui().getMenuGui().getPanels();

@@ -110,13 +110,15 @@ public class PlayerInput {
 	}
 
 	public void moveOrSpecialAction(int mx, int my) {
-		ActiveEntity e = engine.getEntityAt(null, mx, my);
+		ActiveEntity e = engine.getEntityAt(null, mx, my); // this is our enemy unit
 		if (e != null && !(engine.getMap().isEnableFow() && engine.getMap().fogOn(mx / engine.getTileW(), my / engine.getTileH()))) {
             if (!selected.isEmpty() && e instanceof ActiveEntity) {
-				if (selected.size() == 1) {
+				// attack enemy
+                // target() is the attack function
+                if (selected.size() == 1) {
 					selected.get(0).target((ActiveEntity) e, mx / engine.getTileW(), my / engine.getTileH());
 				} else {
-					// All entSystemity target !
+					// All entity target !
 					ArrayList<Point> points = Utils.getCloserPoints(engine.getMap(), movers, mx / engine.getTileW(), my / engine.getTileH());
 
 					int counter = 0;
@@ -190,10 +192,18 @@ public class PlayerInput {
 	}
 
     // TRUNG NGUYEN'S SELECT ACTION FOR LUA
-    public void selectUnitsAt(int mx, int my, int numUnits) {
-        engine.deselectAllEntities();
-        // Select severals entities
-        engine.selectClosestEntities(mx, my, numUnits);
+    public ArrayList<ActiveEntity> selectUnitsAt(int tileX, int tileY, float radius, int numUnits) {
+        // NOTE I DON'T WANT TO DESELECT UNITS. THIS WAY I CAN ADD DIFFERENT TYPES OF UNITS TO THE ONES SELECTED
+        //engine.deselectAllEntities();
+        // Select several entities
+        ArrayList<ActiveEntity> selectedUnits = engine.selectClosestEntities(tileX, tileY, radius, numUnits); // add a way to select specific type of unit
+        selected.addAll(selectedUnits);
+        for(ActiveEntity e : selectedUnits) {
+            if(e instanceof MoveableEntity) {
+                movers.add((MoveableEntity) e);
+            }
+        }
+        return selectedUnits;
     }
 
 	private void updateKey(GameContainer container) {

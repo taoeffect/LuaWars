@@ -1,5 +1,7 @@
 package rts.core.engine.layers.entities;
 
+import rts.Launch;
+
 import java.awt.Point;
 import java.util.Comparator;
 import java.lang.Math;
@@ -24,16 +26,18 @@ public class ActiveEntityComparator implements Comparator<ActiveEntity>{
      * Compares two entities based on a distance,
      * @param o1
      * @param o2
-     * @return 1 if o1 is shorter, 0 if equal, -1 if o1 is longer
+     * @return 1 if o1 is farther, 0 if equal, -1 if o1 is shorter
      */
     @Override
     public int compare(ActiveEntity o1, ActiveEntity o2) {
         double distance1, distance2;
-        distance1 = Math.pow(o1.getX() - point.getX(), 2) + Math.pow(o1.getY() - point.getY(), 2);
-        distance2 = Math.pow(o2.getX() - point.getX(), 2) + Math.pow(o2.getY() - point.getY(), 2);
-        if(distance1 < distance2)
+        // note this compares actual distances, not tile distances
+        // don't think it should matter though
+        distance1 = Math.pow(o1.getX() / Launch.g.getEngine().getTileW() - point.getX(), 2) + Math.pow(o1.getY() / Launch.g.getEngine().getTileH() - point.getY(), 2);
+        distance2 = Math.pow(o2.getX() / Launch.g.getEngine().getTileW() - point.getX(), 2) + Math.pow(o2.getY() / Launch.g.getEngine().getTileH() - point.getY(), 2);
+        if(distance1 > distance2)
             return 1;
-        else if(distance1 > distance2)
+        else if(distance1 < distance2)
             return -1;
         else
             return 0;

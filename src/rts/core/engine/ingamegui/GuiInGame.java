@@ -1,9 +1,16 @@
 package rts.core.engine.ingamegui;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
+import org.luaj.vm2.LuaDouble;
+import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaInteger;
 import org.luaj.vm2.LuaString;
+import org.luaj.vm2.ast.Chunk;
+import org.luaj.vm2.parser.LuaParser;
+import org.luaj.vm2.parser.ParseException;
 import org.luawars.Log;
 import org.luawars.LuaJScripting.CallLua;
 import org.luawars.LuaJScripting.LuaJGlobal;
@@ -52,9 +59,11 @@ public class GuiInGame {
 		this.patch = ResourceManager.getImage("ihmpatch");
 		this.menuGui.init();
         // TRUNG NGUYEN
-        CallLua.runScript("resources/Lua Scripts/myScript.lua");
+        CallLua.runScript("myScript.lua", null);
     }
 
+    // NOTE: THERE'S A WEIRD BUG WHERE IF YOU TYPE IN AN UPPERCASE LETTER IT WILL PUT A SPACE BEFORE THE UPPERCASE LETTER
+    // OR AT LEAST WHEN I TRY TO PRESS SHIFT + LETTER (to make it uppercase)
 	public void keyPressed(int key, char c) {
 		if (speakMod) {
 			switch (key) {
@@ -66,15 +75,16 @@ public class GuiInGame {
                 if(message.contains("create unit ")){
                     Log.trace("attempting to call script function createUnit");
                     CallLua.callFunction("createUnit", LuaInteger.valueOf(message.charAt(message.length() - 2) - '0'), LuaInteger.valueOf(message.charAt(message.length() - 1) - '0'));
-                } else if(message.contains("call new script")){
-                    Log.trace("attempting to call new script");
-                    CallLua.runScript("resources/Lua Scripts/newScript.lua");
+                } else if(message.contains("call ")){
+                    String fileName = message.substring(5, message.length());
+                    Log.trace("attempting to call script: " + fileName + ".lua");
+                    CallLua.runScript(fileName, null);
                 } else if(message.contains("get global")){
                     Log.trace("attempting to get global variable");
                     CallLua.callFunction("getGlobal", LuaString.valueOf("baseX"));
                 } else if(message.contains("select units ")){
                     Log.trace("trying to select units");
-                    CallLua.callFunction("selectUnits", LuaInteger.valueOf(0), LuaInteger.valueOf(0), LuaInteger.valueOf(message.charAt(message.length() - 1) - '0'));
+                    //CallLua.callFunction("selectUnits", LuaInteger.valueOf(0), LuaInteger.valueOf(0), LuaDouble.valueOf(100.0), LuaInteger.valueOf(message.charAt(message.length() - 1) - '0'));
                 } else if(message.contains("move or special action")){
                     Log.trace("trying to move or do special action");
                     CallLua.callFunction("moveOrSpecialAction", LuaInteger.valueOf(0), LuaInteger.valueOf(0));
@@ -112,6 +122,15 @@ public class GuiInGame {
 
 	public void render(GameContainer container, Graphics g) {
 		if (visible) {
+            // TRUNG NGUYEN
+            // draw tile locations so player can see the tiles (so they can do whatever functions they want with them)
+            for(int x = 0; x < Launch.g.getEngine().getMap().getWidthInPixel(); x += 200) {
+                for(int y = 0; y < Launch.g.getEngine().getMap().getHeightInPixel(); y += 200) {
+                    g.setColor(Color.yellow);
+                    g.drawString(((x - Launch.g.getEngine().getXScrollDecal()) / Launch.g.getEngine().getTileW()) + ", " + ((y - Launch.g.getEngine().getYScrollDecal()) / Launch.g.getEngine().getTileH()), x, y);
+                }
+            }
+            //
 			g.drawImage(guiBackground, container.getWidth() - width, 0);
 			if (container.getHeight() > guiBackground.getHeight()) {
 				g.drawImage(patch, container.getWidth() - width, guiBackground.getHeight());

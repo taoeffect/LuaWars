@@ -41,6 +41,8 @@ import rts.utils.ResourceManager;
 import rts.utils.Timer;
 import rts.views.View;
 
+import static java.lang.Math.abs;
+
 /**
  * The entry point to all game mechanics.
  * 
@@ -207,7 +209,7 @@ public class Engine extends View {
 
 	@Override
 	public void render(GameContainer container, StateBasedGame game, Graphics g) throws SlickException {
-		g.setFont(inGameFont);
+        g.setFont(inGameFont);
 		if (!loadGameTimer.isTimeComplete()) {
 			g.setColor(Color.red);
 			g.drawString("Load game, please wait...", container.getWidth() / 2 - 120, container.getHeight() / 2 - 30);
@@ -504,12 +506,12 @@ public class Engine extends View {
 
     /**
      * Creates a priority queue of all the player's active entities based on shortest distance
-     * @param xLoc - point to select close to
-     * @param yLoc
+     * @param tileX - point to select close to
+     * @param tileY
      */
-    public PriorityQueue<ActiveEntity> selectClosestEntities(int xLoc, int yLoc, int numUnits){
+    public ArrayList<ActiveEntity> selectClosestEntities(int tileX, int tileY, float radius, int numUnits){
         PriorityQueue<ActiveEntity> allEnts =
-                new PriorityQueue<ActiveEntity>(10, new ActiveEntityComparator(new Point(xLoc, yLoc)));
+                new PriorityQueue<ActiveEntity>(10, new ActiveEntityComparator(new Point(tileX, tileY)));
         for (int i = 0; i < layers.size(); i++) {
             for(int j = 0; j < layers.get(i).getArray().size(); j++){
                 if(layers.get(i).getArray().get(j) instanceof ActiveEntity){
@@ -520,13 +522,26 @@ public class Engine extends View {
                 }
             }
         }
+        ArrayList<ActiveEntity> selectedUnits = new ArrayList<ActiveEntity>();
         Iterator<ActiveEntity> iter = allEnts.iterator();
         for(int i = 0; i < numUnits; i++){
             if(iter.hasNext()){
-                iter.next().selected();
+                ActiveEntity currentUnit = iter.next();
+                float currentTileX = currentUnit.getX()/getTileW();
+                float currentTileY = currentUnit.getX()/getTileW();
+                // get units less than radius number of tiles away
+                double distanceFromPoint = Math.pow(currentTileX - tileX, 2) + Math.pow(currentTileY - tileY, 2);
+                if(distanceFromPoint > Math.pow(radius, 2))
+                {
+                    // note that once we find one that's not in the distance, we can break
+                    // because all the other ones have a greater radius
+                    break;
+                }
+                selectedUnits.add(currentUnit);
+                currentUnit.selected();
             }
         }
-        return allEnts;
+        return selectedUnits;
     }
 
 	public ArrayList<ActiveEntity> getPlayerSelectedEntities() {

@@ -1,3 +1,4 @@
+-- This lua script pretty much acts as our Lua Library for Lua Wars
 print("running myScript.lua");
 
 -- note that i didn't have to say CallLua = "XXX"
@@ -10,12 +11,19 @@ function createUnit(panelId, buttonNum)
     CallLua.createUnit(panelId, buttonNum)
 end
 
-function selectUnits(xLoc, yLoc, numUnits)
-    CallLua.selectUnits(xLoc, yLoc, numUnits)
+function selectUnits(tileX, tileY, radius, numUnits)
+    print("running lua.selectUnits() function");
+    CallLua.selectUnits(tileX, tileY, radius, numUnits)
 end
 
-function moveOrSpecialAction(xLoc, yLoc)
-    CallLua.moveOrSpecialAction(xLoc, yLoc)
+function deselectUnits()
+    CallLua.deselectUnits()
+end
+
+function moveOrSpecialAction(tileX, tileY)
+    print("running lua.moveUnits() function");
+
+    CallLua.moveOrSpecialAction(tileX, tileY)
 end
 
 function getGlobal(globalVarName)
@@ -26,6 +34,6 @@ function getGlobal(globalVarName)
     return CallLua.getLuaJGlobal(globalVarName)
 end
 
-function placeBuilding(xLoc, yLoc)
-    CallLua.placeBuilding(xLoc, yLoc)
+function placeBuilding(tileX, tileY)
+    CallLua.placeBuilding(tileX, tileY)
 end
