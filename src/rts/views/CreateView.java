@@ -120,7 +120,7 @@ public class CreateView extends View {
         totalMaps = maps.size();
 
         //remove the maps not yet unlocked by the current profile
-        int delete = maps.size() - Configuration.getProgress(Configuration.getProfile());
+        int delete = maps.size() - Configuration.getProgress(Configuration.getProfile1());
         if (delete >= 0)
         {
             while(delete != 0)
@@ -282,7 +282,7 @@ public class CreateView extends View {
 		launchButton.addCallback(new Runnable() {
 			@Override
 			public void run() {
-                if (mapList.getSelected() == Configuration.getProgress(Configuration.getProfile()) - 1)
+                if (mapList.getSelected() == Configuration.getProgress(Configuration.getProfile1()) - 1)
                 {
                       comboTecLevel.setSelected(0);
                       comboMoney.setSelected(1);

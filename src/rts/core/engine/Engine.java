@@ -391,9 +391,9 @@ public class Engine extends View {
 					gameWin = true;
                     if (checkUnlock())                             //if it's true that the next map should be unlock, add 1 to number of unlocked maps for current profile
                     {
-                        int k =  Configuration.getProgress(Configuration.getProfile());
+                        int k =  Configuration.getProgress(Configuration.getProfile1());
                         k++;
-                        Configuration.setProgress(Configuration.getProfile(), k);
+                        Configuration.setProgress(Configuration.getProfile1(), k);
                         game.getStateByIndex(6).initResources();                         //update CreateView
                         game.getStateByIndex(6).initTwlComponent();
                     }
@@ -423,7 +423,7 @@ public class Engine extends View {
                 correctMap = i;                                                 //number of the current map as listed in CreateView
             }
         }
-        if(correctMap == Configuration.getProgress(Configuration.getProfile()) - 1)   //if current map is the last map that was last unlocked, result is true
+        if(correctMap == Configuration.getProgress(Configuration.getProfile1()) - 1)   //if current map is the last map that was last unlocked, result is true
         {
                result = true;
         }
