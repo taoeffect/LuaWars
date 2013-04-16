@@ -26,7 +26,7 @@ public class Layer {
 
 	private int id;
 	private boolean visible;
-	private ArrayList<IEntity> array;
+    private ArrayList<IEntity> array;
 	private Engine engine;
 
 	public Layer(Engine engine, int id) {
@@ -35,6 +35,11 @@ public class Layer {
 		this.array = new ArrayList<IEntity>();
 		this.visible = true;
 	}
+
+    // TRUNG NGUYEN need to get all the entities to use in the engine to select closest units to a point
+    public ArrayList<IEntity> getArray() {
+        return array;
+    }
 
 	public void render(GameContainer container, Graphics g) throws SlickException {
 		if (visible) {
