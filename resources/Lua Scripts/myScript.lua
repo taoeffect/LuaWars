@@ -11,9 +11,10 @@ function createUnit(panelId, buttonNum)
     CallLua.createUnit(panelId, buttonNum)
 end
 
-function selectUnits(tileX, tileY, radius, numUnits)
+function selectUnits(tileX, tileY, radius, numUnits, unitType)
+    unitType = unitType or NIL; -- not sure if this will work or not
     print("running lua.selectUnits() function");
-    CallLua.selectUnits(tileX, tileY, radius, numUnits)
+    CallLua.selectUnits(tileX, tileY, radius, numUnits, unitType)
 end
 
 function deselectUnits()

@@ -9,11 +9,9 @@ import org.luaj.vm2.lib.jse.*;
 import org.luaj.vm2.parser.LuaParser;
 import org.luaj.vm2.parser.ParseException;
 import org.luawars.Log;
-import org.newdawn.slick.KeyListener;
 import rts.Launch;
 import rts.core.engine.ingamegui.GuiButton;
 import rts.core.engine.ingamegui.GuiPanel;
-import rts.core.engine.ingamegui.GuiPanelFactory;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -222,12 +220,15 @@ public class CallLua extends TwoArgFunction {
     }
 
     public static class selectUnits extends SevenArgFunction {
-        public LuaValue call(LuaValue tileX, LuaValue tileY, LuaValue radius, LuaValue numUnits, LuaValue NIL0, LuaValue NIL1, LuaValue NIL2) {
+        public LuaValue call(LuaValue tileX, LuaValue tileY, LuaValue radius, LuaValue numUnits, LuaValue unitType, LuaValue NIL1, LuaValue NIL2) {
             System.out.println("running java.selectUnits()");
             // make it return a list of the selected units
             // right now selectUnitsAt returns an arraylist of active entities
             // might need to convert them into a lua list
-            System.out.println(Launch.g.getEngine().getInput().selectUnitsAt(tileX.toint(), tileY.toint(), radius.tofloat(), numUnits.toint()));
+            // if unit type is NIL, then make tempUnitType null,
+            // or if the unit name is provided then select that unit
+            String tempUnitType = unitType == NIL ? null : unitType.tojstring();
+            System.out.println(Launch.g.getEngine().getInput().selectUnitsAt(tileX.toint(), tileY.toint(), radius.tofloat(), numUnits.toint(), tempUnitType));
             return NIL;
         }
     }

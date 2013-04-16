@@ -1,19 +1,11 @@
 package rts.core.engine.ingamegui;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
-import org.luaj.vm2.LuaDouble;
-import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaInteger;
 import org.luaj.vm2.LuaString;
-import org.luaj.vm2.ast.Chunk;
-import org.luaj.vm2.parser.LuaParser;
-import org.luaj.vm2.parser.ParseException;
 import org.luawars.Log;
 import org.luawars.LuaJScripting.CallLua;
-import org.luawars.LuaJScripting.LuaJGlobal;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;

@@ -1,5 +1,6 @@
-
-selectUnits(10, 10, 100, 10)
+selectUnits(10, 10, 100, 10, "Scout")
+selectUnits(10, 10, 100, 10, "Soldier")
 print("units selected")
 moveOrSpecialAction(20, 20)
 print("move called")
+deselectUnits()

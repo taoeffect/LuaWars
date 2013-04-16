@@ -25,10 +25,7 @@ import de.matthiasmann.twl.Widget;
 import rts.core.Game;
 import rts.core.engine.ingamegui.GuiInGame;
 import rts.core.engine.layers.Layer;
-import rts.core.engine.layers.entities.ActiveEntity;
-import rts.core.engine.layers.entities.ActiveEntityComparator;
-import rts.core.engine.layers.entities.IEntity;
-import rts.core.engine.layers.entities.MoveableEntity;
+import rts.core.engine.layers.entities.*;
 import rts.core.engine.layers.entities.buildings.Building;
 import rts.core.engine.layers.entities.effects.EffectManager;
 import rts.core.engine.layers.entities.others.CountDown;
@@ -504,19 +501,31 @@ public class Engine extends View {
 		}
 	}
 
+    private int getTypeFromName(String unitName) {
+        int type = -1;
+        for(int i = 0; i < EData.NAMES.length; i++) {
+            if(EData.NAMES[i].equals(unitName)) {
+                type = i;
+                break;
+            }
+        }
+        return type;
+    }
+
     /**
      * Creates a priority queue of all the player's active entities based on shortest distance
      * @param tileX - point to select close to
      * @param tileY
      */
-    public ArrayList<ActiveEntity> selectClosestEntities(int tileX, int tileY, float radius, int numUnits){
+    public ArrayList<ActiveEntity> selectClosestEntities(int tileX, int tileY, float radius, int numUnits, String unitType){
         PriorityQueue<ActiveEntity> allEnts =
                 new PriorityQueue<ActiveEntity>(10, new ActiveEntityComparator(new Point(tileX, tileY)));
+        int wantedUnitType = unitType == null ? -1 : getTypeFromName(unitType);
         for (int i = 0; i < layers.size(); i++) {
             for(int j = 0; j < layers.get(i).getArray().size(); j++){
                 if(layers.get(i).getArray().get(j) instanceof ActiveEntity){
                     ActiveEntity currentUnit = (ActiveEntity) layers.get(i).getArray().get(j);
-                    if(currentUnit.getPlayerId() == this.getPlayer().getId()){
+                    if(currentUnit.getPlayerId() == this.getPlayer().getId() && (unitType == null || wantedUnitType == currentUnit.getType())) {
                         allEnts.add(currentUnit);
                     }
                 }

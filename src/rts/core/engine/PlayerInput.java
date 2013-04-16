@@ -192,11 +192,11 @@ public class PlayerInput {
 	}
 
     // TRUNG NGUYEN'S SELECT ACTION FOR LUA
-    public ArrayList<ActiveEntity> selectUnitsAt(int tileX, int tileY, float radius, int numUnits) {
+    public ArrayList<ActiveEntity> selectUnitsAt(int tileX, int tileY, float radius, int numUnits, String unitType) {
         // NOTE I DON'T WANT TO DESELECT UNITS. THIS WAY I CAN ADD DIFFERENT TYPES OF UNITS TO THE ONES SELECTED
         //engine.deselectAllEntities();
         // Select several entities
-        ArrayList<ActiveEntity> selectedUnits = engine.selectClosestEntities(tileX, tileY, radius, numUnits); // add a way to select specific type of unit
+        ArrayList<ActiveEntity> selectedUnits = engine.selectClosestEntities(tileX, tileY, radius, numUnits, unitType); // add a way to select specific type of unit
         selected.addAll(selectedUnits);
         for(ActiveEntity e : selectedUnits) {
             if(e instanceof MoveableEntity) {
