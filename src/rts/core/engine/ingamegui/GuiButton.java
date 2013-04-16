@@ -45,7 +45,7 @@ public class GuiButton {
 	private int width;
 	private int height;
 	private boolean enable;
-	private boolean visible;
+	private boolean visible;    // not sure what visible is
 	private boolean tabButton;
 	private boolean limitAtOne;
 	private boolean blink;
@@ -95,7 +95,7 @@ public class GuiButton {
 						processList.add(new CreateEntityProcess());
 				}
 			}
-		} else {
+		} else if(enable) {
 			GameSound.construction();
 			panel.addButtonToWait(this);
 			processList.add(new CreateEntityProcess());
@@ -235,6 +235,7 @@ public class GuiButton {
 		if (visible && engine.isMouseLeftPressed()) {
 			int x = engine.getMouseX() / engine.getTileW();
 			int y = engine.getMouseY() / engine.getTileH();
+            System.out.println("buildIng at coor" + x + ", " + y);
 			if (building != null && building.isValidLocation(x, y)) {
 				Player player = engine.getPlayer();
 				if (engine.isNetwork()) {
@@ -284,6 +285,64 @@ public class GuiButton {
 		}
 		return checkProcess(delta);
 	}
+
+    // Modeled after update(delta) function above
+    public boolean placeBuilding(int x, int y) {
+        // first check to see if we can build a building
+        if (processList.size() > 0 && processList.get(0).ready) {
+            building = (Building) EntityGenerator.createActiveEntityNoNetwork(engine, entType, 0, 0);
+        }
+        // visible checked to see if you were on the correct panel,
+        // but i don't really care about what panel i'm on anymore,
+        // i just need to build the building.
+        // this is why i didn't include boolean visible in this check
+        if (building != null && building.checkValidPlacement(x, y)) {
+            Player player = engine.getPlayer();
+            if (engine.isNetwork()) {
+                if (building instanceof Wall) {
+                    ArrayList<Point> a = ((Wall) building).getOthersValidLocation();
+                    for (int i = 0; i < a.size(); i++) {
+                        engine.getNetworkManager().sendCreateEntity(entType, player.getId(), player.getTeamId(), a.get(i).x * engine.getTileW(),
+                                a.get(i).y * engine.getTileH());
+                    }
+                }
+                engine.getNetworkManager().sendCreateEntity(entType, player.getId(), player.getTeamId(), x * engine.getTileW(), y * engine.getTileH());
+            } else {
+                ActiveEntity ae = EntityGenerator.createActiveEntityNoNetwork(engine, entType, player.getId(), player.getTeamId());
+                ae.setLocation(x * engine.getTileW(), y * engine.getTileH());
+                if (ae instanceof BuildingECreator) {
+                    ((BuildingECreator) ae).checkPrimary();
+                } else {
+                    if (ae instanceof Wall) {
+                        ArrayList<Point> a = ((Wall) ae).getOthersValidLocation();
+                        for (int i = 0; i < a.size(); i++) {
+                            ActiveEntity w = EntityGenerator.createActiveEntityNoNetwork(engine, entType, player.getId(), player.getTeamId());
+                            w.setLocation(a.get(i).x * engine.getTileW(), a.get(i).y * engine.getTileH());
+                            engine.addEntity(w);
+                        }
+                    }
+                }
+                engine.addEntity(ae);
+
+                // Special case type = refinery = + 1 collector
+                if (entType == EData.BUILDING_REFINERY) {
+                    Point p2 = Utils.getCloserPoint(engine.getMap(), x, y);
+                    if (p2 != null) {
+                        ae = EntityGenerator.createActiveEntityNoNetwork(engine, EData.MOVER_COLLECTOR, player.getId(), player.getTeamId());
+                        ae.setLocation(p2.x * engine.getTileW(), p2.y * engine.getTileH());
+                        engine.addEntity(ae);
+                    }
+                }
+            }
+            engine.getGui().addEntityToBuildingList(entType);
+            processList.remove(0);
+            building = null;
+            return true;
+        }
+        // if we tried to place a building but failed, then deselect the building we are trying to place
+        building = null;
+        return false;
+    }
 
 	private boolean checkProcess(int delta) {
 		if (!processList.isEmpty()) {

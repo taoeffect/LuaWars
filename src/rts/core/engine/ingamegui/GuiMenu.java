@@ -15,7 +15,7 @@ public class GuiMenu {
 
 	private Engine engine;
 	private ArrayList<Integer> buildingList;
-	private ArrayList<GuiPanel> panels;
+    private ArrayList<GuiPanel> panels;
 	private GuiButton[] menusButton;
 	private GuiButton repairButton;
 	private GuiButton sellButton;
@@ -213,5 +213,9 @@ public class GuiMenu {
 	public boolean isSellMod() {
 		return sellMod;
 	}
+
+    public ArrayList<GuiPanel> getPanels() {
+        return panels;
+    }
 
 }

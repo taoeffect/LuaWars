@@ -151,8 +151,20 @@ public abstract class Building extends ActiveEntity implements IBigEntity {
 		return validLocation;
 	}
 
+    // TRUNG NGUYEN
+    // THIS CHECK IS A CERTAIN x, y LOCATION IS A VALID SPOT
+    // it is modeled after checkValidLocation
+    // does not need graphics and does not need to check for realX, realY
+    public boolean checkValidPlacement(int x, int y) {
+        if (engine.getMap().isEntityOccupy(x, y) || engine.getMap().isBlocked(x, y) || engine.getMap().isWater(x, y)) {
+            return false;
+        }
+        return true;
+    }
+
+
 	protected void checkValidLocation(Graphics g, Building closer, int x, int y) {
-		if (engine.getMap().isEntityOccupy(x, y) || engine.getMap().isBlocked(x, y) || engine.getMap().isWater(x, y)
+        if (engine.getMap().isEntityOccupy(x, y) || engine.getMap().isBlocked(x, y) || engine.getMap().isWater(x, y)
 				|| (Utils.getDistanceBetween(x * engine.getTileW(), y * engine.getTileH(), closer.getRealX(), closer.getRealY()) > distanceMaxBetweenBuilding)) {
 			g.setColor(FADE_RED);
 			validLocation = false;

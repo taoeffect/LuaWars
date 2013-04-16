@@ -10,6 +10,9 @@ import rts.utils.ResourceManager;
 
 public final class GuiPanelFactory {
 
+    // NOTE: this creates a new array of panels each time you call it.
+    // If you want to access panels, don't access panels using this function.
+    // access them using the GuiMenu's panels
 	public static ArrayList<GuiPanel> getAllPanels(Engine engine, GuiMenu menu) {
 		ArrayList<GuiPanel> array = new ArrayList<GuiPanel>();
 		array.add(getBuildingPanel(engine, menu, 0));
