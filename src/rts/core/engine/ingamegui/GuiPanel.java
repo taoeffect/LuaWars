@@ -2,12 +2,16 @@ package rts.core.engine.ingamegui;
 
 import java.util.ArrayList;
 
+import org.luaj.vm2.lib.OneArgFunction;
+import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.LuaError;
+import org.luawars.Log;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 
 public class GuiPanel {
 
-	private ArrayList<GuiButton> buttons;
+    private ArrayList<GuiButton> buttons;
 	private ArrayList<GuiButton> waitingList;
 	private GuiMenu menu;
 	private int id;
@@ -21,6 +25,11 @@ public class GuiPanel {
 		buttons = new ArrayList<GuiButton>();
 		waitingList = new ArrayList<GuiButton>();
 	}
+
+    // TRUNG NGUYEN
+    public ArrayList<GuiButton> getButtons() {
+        return buttons;
+    }
 
 	public void setLocation(int x, int y) {
 		this.x = x;
@@ -57,7 +66,14 @@ public class GuiPanel {
 		}
 	}
 
-	public void update(ArrayList<Integer> buildingList, int delta, boolean visible) {
+    @Override
+    public String toString() {
+        return "GuiPanel{" +
+                "id=" + id +
+                '}';
+    }
+
+    public void update(ArrayList<Integer> buildingList, int delta, boolean visible) {
 		boolean oneProcessReady = false;
 		for (int i = 0; i < buttons.size(); i++) {
 			buttons.get(i).checkEnable(buildingList, delta, visible);
