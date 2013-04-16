@@ -57,7 +57,7 @@ public class MainMenuView extends View {
                // try {
                    // game.getNetworkManager().createServer();
                     //game.getNetworkManager().joinServer("localhost");
-               game.enterState(Game.CREATE_VIEW_ID, new FadeOutTransition(), new FadeInTransition());
+               game.enterState(Game.PROFILE_VIEW_ID, new FadeOutTransition(), new FadeInTransition());
                 //} catch (IOException e) {
                 //    e.printStackTrace();
                 //}
