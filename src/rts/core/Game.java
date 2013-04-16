@@ -55,7 +55,7 @@ public class Game extends StateBasedGame {
 	/**
 	 * The current name of the project.
 	 */
-	public static final String NAME = "STK RTS";
+	public static final String NAME = "LUA WARS";
 	/**
 	 * The current version of the project.
 	 */
