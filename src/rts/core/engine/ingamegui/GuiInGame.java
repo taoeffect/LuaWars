@@ -2,12 +2,17 @@ package rts.core.engine.ingamegui;
 
 import java.util.ArrayList;
 
+import org.luaj.vm2.LuaInteger;
+import org.luaj.vm2.LuaString;
+import org.luawars.Log;
+import org.luawars.LuaJScripting.CallLua;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 
+import rts.Launch;
 import rts.core.engine.Engine;
 import rts.core.engine.Player;
 import rts.core.network.menu_tcp_containers.MessageState;
@@ -45,8 +50,12 @@ public class GuiInGame {
 		this.guiBackground = ResourceManager.getImage("ihm_ingame");
 		this.patch = ResourceManager.getImage("ihmpatch");
 		this.menuGui.init();
-	}
+        // TRUNG NGUYEN
+        CallLua.runScript("myScript.lua", null);
+    }
 
+    // NOTE: THERE'S A WEIRD BUG WHERE IF YOU TYPE IN AN UPPERCASE LETTER IT WILL PUT A SPACE BEFORE THE UPPERCASE LETTER
+    // OR AT LEAST WHEN I TRY TO PRESS SHIFT + LETTER (to make it uppercase)
 	public void keyPressed(int key, char c) {
 		if (speakMod) {
 			switch (key) {
@@ -55,8 +64,28 @@ public class GuiInGame {
 					addMessage(engine.getNetworkManager().sendMessage(message));
 				}
 				speakMod = false;
-				message = "";
-				break;
+                if(message.contains("create unit ")){
+                    Log.trace("attempting to call script function createUnit");
+                    CallLua.callFunction("createUnit", LuaInteger.valueOf(message.charAt(message.length() - 2) - '0'), LuaInteger.valueOf(message.charAt(message.length() - 1) - '0'));
+                } else if(message.contains("call ")){
+                    String fileName = message.substring(5, message.length());
+                    Log.trace("attempting to call script: " + fileName + ".lua");
+                    CallLua.runScript(fileName, null);
+                } else if(message.contains("get global")){
+                    Log.trace("attempting to get global variable");
+                    CallLua.callFunction("getGlobal", LuaString.valueOf("baseX"));
+                } else if(message.contains("select units ")){
+                    Log.trace("trying to select units");
+                    //CallLua.callFunction("selectUnits", LuaInteger.valueOf(0), LuaInteger.valueOf(0), LuaDouble.valueOf(100.0), LuaInteger.valueOf(message.charAt(message.length() - 1) - '0'));
+                } else if(message.contains("move or special action")){
+                    Log.trace("trying to move or do special action");
+                    CallLua.callFunction("moveOrSpecialAction", LuaInteger.valueOf(0), LuaInteger.valueOf(0));
+                } else if(message.contains("place building")){
+                    Log.trace("trying to place building");
+                    CallLua.callFunction("placeBuilding", LuaInteger.valueOf(34), LuaInteger.valueOf(43));
+                }
+                message = "";
+                break;
 			case Input.KEY_ESCAPE:
 				speakMod = false;
 				message = "";
@@ -64,7 +93,7 @@ public class GuiInGame {
 			case Input.KEY_BACK:
 				if (!message.isEmpty())
 					message = message.substring(0, message.length() - 1);
-				break;
+                break;
 			default:
 				message += c;
 				break;
@@ -81,10 +110,19 @@ public class GuiInGame {
 
 	public void mousePressed(int button, int x, int y) {
 		menuGui.mousePressed(button, x, y);
-	}
+    }
 
 	public void render(GameContainer container, Graphics g) {
 		if (visible) {
+            // TRUNG NGUYEN
+            // draw tile locations so player can see the tiles (so they can do whatever functions they want with them)
+            for(int x = 0; x < Launch.g.getEngine().getMap().getWidthInPixel(); x += 200) {
+                for(int y = 0; y < Launch.g.getEngine().getMap().getHeightInPixel(); y += 200) {
+                    g.setColor(Color.yellow);
+                    g.drawString(((x - Launch.g.getEngine().getXScrollDecal()) / Launch.g.getEngine().getTileW()) + ", " + ((y - Launch.g.getEngine().getYScrollDecal()) / Launch.g.getEngine().getTileH()), x, y);
+                }
+            }
+            //
 			g.drawImage(guiBackground, container.getWidth() - width, 0);
 			if (container.getHeight() > guiBackground.getHeight()) {
 				g.drawImage(patch, container.getWidth() - width, guiBackground.getHeight());
@@ -250,6 +288,11 @@ public class GuiInGame {
 		else
 			return 0;
 	}
+
+    // TRUNG NGUYEN
+    public GuiMenu getMenuGui() {
+        return menuGui;
+    }
 
 	public boolean isRepairMod() {
 		return menuGui.isRepairMod();

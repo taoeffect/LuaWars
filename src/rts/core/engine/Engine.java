@@ -1,8 +1,11 @@
 package rts.core.engine;
 
+import java.awt.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.PriorityQueue;
+import java.util.Iterator;
+import java.util.Collections;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Font;
@@ -23,9 +26,7 @@ import de.matthiasmann.twl.Widget;
 import rts.core.Game;
 import rts.core.engine.ingamegui.GuiInGame;
 import rts.core.engine.layers.Layer;
-import rts.core.engine.layers.entities.ActiveEntity;
-import rts.core.engine.layers.entities.IEntity;
-import rts.core.engine.layers.entities.MoveableEntity;
+import rts.core.engine.layers.entities.*;
 import rts.core.engine.layers.entities.buildings.Building;
 import rts.core.engine.layers.entities.effects.EffectManager;
 import rts.core.engine.layers.entities.others.CountDown;
@@ -37,6 +38,8 @@ import rts.utils.Configuration;
 import rts.utils.ResourceManager;
 import rts.utils.Timer;
 import rts.views.View;
+
+import static java.lang.Math.abs;
 
 /**
  * The entry point to all game mechanics.
@@ -70,7 +73,13 @@ public class Engine extends View {
 	private Timer loadGameTimer;
 	private Timer exitTimer;
 	private Image gameOverImage;
-	private Image gameWinImage;
+
+    //TRUNG NGUYEN
+    public PlayerInput getInput() {
+        return input;
+    }
+
+    private Image gameWinImage;
 	private int currentRound;
 	private int xScrollDecal;
 	private int yScrollDecal;
@@ -199,6 +208,7 @@ public class Engine extends View {
 	@Override
 	public void render(GameContainer container, StateBasedGame game, Graphics g) throws SlickException {
 		g.setFont(inGameFont);
+
 		if (!loadGameTimer.isTimeComplete()) {
 			g.setColor(Color.red);
 			g.drawString("Load game, please wait...", container.getWidth() / 2 - 120, container.getHeight() / 2 - 30);
@@ -522,6 +532,58 @@ public class Engine extends View {
 			layers.get(i).selectEntitiesBetween((sx <= mx) ? sx : mx, (sy <= my) ? sy : my, (sx > mx) ? sx : mx, (sy > my) ? sy : my);
 		}
 	}
+
+    private int getTypeFromName(String unitName) {
+        int type = -1;
+        for(int i = 0; i < EData.NAMES.length; i++) {
+            if(EData.NAMES[i].equals(unitName)) {
+                type = i;
+                break;
+            }
+        }
+        return type;
+    }
+
+    /**
+     * Creates a priority queue of all the player's active entities based on shortest distance
+     * @param tileX - point to select close to
+     * @param tileY
+     */
+    public ArrayList<ActiveEntity> selectClosestEntities(int tileX, int tileY, float radius, int numUnits, String unitType){
+        PriorityQueue<ActiveEntity> allEnts =
+                new PriorityQueue<ActiveEntity>(10, new ActiveEntityComparator(new Point(tileX, tileY)));
+        int wantedUnitType = unitType == null ? -1 : getTypeFromName(unitType);
+        for (int i = 0; i < layers.size(); i++) {
+            for(int j = 0; j < layers.get(i).getArray().size(); j++){
+                if(layers.get(i).getArray().get(j) instanceof ActiveEntity){
+                    ActiveEntity currentUnit = (ActiveEntity) layers.get(i).getArray().get(j);
+                    if(currentUnit.getPlayerId() == this.getPlayer().getId() && (unitType == null || wantedUnitType == currentUnit.getType())) {
+                        allEnts.add(currentUnit);
+                    }
+                }
+            }
+        }
+        ArrayList<ActiveEntity> selectedUnits = new ArrayList<ActiveEntity>();
+        Iterator<ActiveEntity> iter = allEnts.iterator();
+        for(int i = 0; i < numUnits; i++){
+            if(iter.hasNext()){
+                ActiveEntity currentUnit = iter.next();
+                float currentTileX = currentUnit.getX()/getTileW();
+                float currentTileY = currentUnit.getX()/getTileW();
+                // get units less than radius number of tiles away
+                double distanceFromPoint = Math.pow(currentTileX - tileX, 2) + Math.pow(currentTileY - tileY, 2);
+                if(distanceFromPoint > Math.pow(radius, 2))
+                {
+                    // note that once we find one that's not in the distance, we can break
+                    // because all the other ones have a greater radius
+                    break;
+                }
+                selectedUnits.add(currentUnit);
+                currentUnit.selected();
+            }
+        }
+        return selectedUnits;
+    }
 
 	public ArrayList<ActiveEntity> getPlayerSelectedEntities() {
 		ArrayList<ActiveEntity> a = new ArrayList<ActiveEntity>();
