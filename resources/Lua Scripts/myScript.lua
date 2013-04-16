@@ -38,3 +38,7 @@ end
 function placeBuilding(tileX, tileY)
     CallLua.placeBuilding(tileX, tileY)
 end
+
+function setUpBase()
+    CallLua.setUpBase()
+end

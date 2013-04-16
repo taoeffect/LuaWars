@@ -5,6 +5,7 @@ import org.luaj.vm2.ast.Chunk;
 import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.ThreeArgFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
+import org.luaj.vm2.lib.ZeroArgFunction;
 import org.luaj.vm2.lib.jse.*;
 import org.luaj.vm2.parser.LuaParser;
 import org.luaj.vm2.parser.ParseException;
@@ -73,6 +74,7 @@ public class CallLua extends TwoArgFunction {
         library.set("moveOrSpecialAction", new moveOrSpecialAction());
         library.set("getLuaJGlobal", new getLuaJGlobal());
         library.set("placeBuilding", new placeBuilding());
+        library.set("setUpBase", new setUpBase());
         env.set("org.luawars.LuaJScripting.CallLua", library);
 
         return library;
@@ -220,6 +222,8 @@ public class CallLua extends TwoArgFunction {
     }
 
     public static class selectUnits extends SevenArgFunction {
+        // NOTE: THIS COULD MESS UP BECAUSE THERE ARE MULTIPLE UNITS THAT HAVE THE NAME BUILDER,
+        // LIKEWISE THERE ARE MULTIPLE UNITS WITH THE NAME SCOUT
         public LuaValue call(LuaValue tileX, LuaValue tileY, LuaValue radius, LuaValue numUnits, LuaValue unitType, LuaValue NIL1, LuaValue NIL2) {
             System.out.println("running java.selectUnits()");
             // make it return a list of the selected units
@@ -277,6 +281,13 @@ public class CallLua extends TwoArgFunction {
                     }
                 }
             }
+            return NIL;
+        }
+    }
+
+    public static class setUpBase extends ZeroArgFunction {
+        public LuaValue call() {
+            Launch.g.getEngine().getInput().setUpBase();
             return NIL;
         }
     }

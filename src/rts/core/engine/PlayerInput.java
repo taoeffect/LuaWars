@@ -206,6 +206,13 @@ public class PlayerInput {
         return selectedUnits;
     }
 
+    public void setUpBase() {
+        ArrayList<ActiveEntity> selectedUnits = selectUnitsAt(0, 0, 10000, 1, "Builder"); // add a way to select specific type of unit
+        if(selectedUnits.size() > 0) {
+            moveOrSpecialAction((int)selectedUnits.get(0).getX(), (int)selectedUnits.get(0).getY());
+        }
+    }
+
 	private void updateKey(GameContainer container) {
 		if (container.getInput().isKeyPressed(Input.KEY_TAB))
 			engine.getGui().hideOrShow();
