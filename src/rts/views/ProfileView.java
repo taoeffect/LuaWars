@@ -72,7 +72,7 @@ public class ProfileView extends View
     public void initResources()
     {
         //To change body of implemented methods use File | Settings | File Templates.
-        background = ResourceManager.getImage("network_view_background");
+        background = ResourceManager.getImage("profile_view_background");
     }
 
     @Override
