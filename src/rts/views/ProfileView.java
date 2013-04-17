@@ -161,6 +161,10 @@ public class ProfileView extends View
         createpanel.add(textField);
         root.add(createpanel);
 
+        if (!Configuration.getName1().equals("Player"))
+        {
+           simpleTable.addRow(Configuration.getName1());
+        }
         //Buttons
         deleteButton = new Button("Delete");
         deleteButton.setPosition(60,300);
