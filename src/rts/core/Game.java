@@ -13,6 +13,9 @@ import de.matthiasmann.twl.GUI;
 import de.matthiasmann.twl.renderer.lwjgl.LWJGLRenderer;
 import de.matthiasmann.twl.theme.ThemeManager;
 
+import org.newdawn.slick.state.GameState;
+import org.newdawn.slick.state.StateBasedGame;
+import org.newdawn.slick.util.InputAdapter;
 import rts.core.engine.Engine;
 import rts.core.network.NetworkManager;
 import rts.utils.Configuration;

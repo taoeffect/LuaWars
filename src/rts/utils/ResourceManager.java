@@ -133,7 +133,7 @@ public class ResourceManager {
 		if (LoadingList.get().getRemainingResources() > 0) {
 			DeferredResource nextResource = LoadingList.get().getNext();
 			try {
-                Log.debug(Log.me() + ": " + nextResource.getDescription());
+                Log.trace(Log.me() + ": " + nextResource.getDescription());
 				nextResource.load();
 			} catch (IOException e) {
 				e.printStackTrace();

@@ -85,7 +85,7 @@ public class ResourcesView extends View {
         super.update(container, sbGame, delta);
 		timer.update(delta);
 		if (timer.isTimeComplete()) {
-            Log.debug(Log.me() + " ... ResourceManager.loadNextResource() ...");
+            Log.trace(Log.me() + " ... ResourceManager.loadNextResource() ...");
 			ResourceManager.loadNextResource();
 			if (ResourceManager.isLoadComplete() && !ready) {
 				for (int i = 1; i < sbGame.getStateCount(); i++) {
@@ -104,7 +104,7 @@ public class ResourcesView extends View {
             bar.setValue(((float) ResourceManager.getAdvancement()) / 100);
             if (ResourceManager.getAdvancement() >= 100 && !stated) {
                 stated = true;
-                Log.warn("done loading resources!!");
+                Log.trace("done loading resources!!");
             }
         }
 	}
