@@ -8,9 +8,6 @@ import org.luawars.gui.MainPanel;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.*;
-import org.newdawn.slick.state.GameState;
-import org.newdawn.slick.state.StateBasedGame;
-import org.newdawn.slick.util.InputAdapter;
 
 import de.matthiasmann.twl.GUI;
 import de.matthiasmann.twl.renderer.lwjgl.LWJGLRenderer;
@@ -29,6 +26,8 @@ import rts.views.ResourcesView;
 import rts.views.View;
 
 import javax.swing.*;
+import rts.views.TutorialView;
+import rts.views.ProfileView;
 
 /**
  * The main game class, contain the view lists and the launch process.
@@ -47,11 +46,13 @@ public class Game extends StateBasedGame {
 	public static final int CREDITS_VIEW_ID = 5;
 	public static final int ENGINE_VIEW_ID = 6;
 	public static final int CREATE_VIEW_ID = 7;
+    public static final int TUTORIAL_VIEW_ID = 8;
+    public static final int PROFILE_VIEW_ID = 9;
 
 	/**
 	 * The current name of the project.
 	 */
-	public static final String NAME = "STK RTS";
+	public static final String NAME = "LUA WARS";
 	/**
 	 * The current version of the project.
 	 */
@@ -96,13 +97,17 @@ public class Game extends StateBasedGame {
 	@Override
 	public void initStatesList(GameContainer container) throws SlickException {
         Log.logEnterMethod(Log.DEBUG);
-        addState(new ResourcesView(container));
+
+		addState(new ResourcesView(container));
 		addState(new MainMenuView());
 		addState(new NetworkView());
 		addState(new OptionsView());
 		addState(new CreditsView());
 		addState(new Engine());
 		addState(new CreateView());
+        addState(new TutorialView());
+        addState(new ProfileView());
+
         Log.debug(Log.me() + " createTWLRenderer()...");
 		createTWLRenderer();
         Log.logExitMethod(Log.DEBUG);

@@ -383,6 +383,10 @@ public class Map extends TiledMap implements TileBasedMap, Comparable<Map> {
 		return width * tileWidth;
 	}
 
+    public String getName() {
+        return name;
+    }
+
 	public int getHeightInPixel() {
 		return height * tileHeight;
 	}
@@ -407,7 +411,7 @@ public class Map extends TiledMap implements TileBasedMap, Comparable<Map> {
 
 	@Override
 	public String toString() {
-		return "[" + spawns.size() + " Players] " + name;
+		return "[" + (spawns.size() - 1) + " Opponents] " + name;
 	}
 
 	private static class Ent {

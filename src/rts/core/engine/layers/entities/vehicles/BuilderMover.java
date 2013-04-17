@@ -1,5 +1,6 @@
 package rts.core.engine.layers.entities.vehicles;
 
+import org.luawars.LuaJScripting.LuaJGlobal;
 import rts.core.engine.Engine;
 import rts.core.engine.PlayerInput;
 import rts.core.engine.layers.entities.ActiveEntity;
@@ -36,6 +37,11 @@ public class BuilderMover extends Mover {
 			}
 
 			if (ok) {
+                // TRUNG NGUYEN
+                // when you set up a base, set the baseX and baseY location
+                LuaJGlobal.addNewLuaJGlobal("baseX", tx);
+                LuaJGlobal.addNewLuaJGlobal("baseY", ty);
+                //
 				remove();
 				if (engine.isNetwork()) {
 					engine.getNetworkManager().sendCreateEntity(EData.BUILDING_BUILDER, playerId, teamId, x, y - 40);

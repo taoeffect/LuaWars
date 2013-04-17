@@ -44,7 +44,7 @@ public class SimpleTableModel extends AbstractTableModel {
 
     public SimpleTableModel(String[] columnHeaders) {
         if(columnHeaders.length < 1) {
-            throw new IllegalArgumentException("must have atleast one column");
+            throw new IllegalArgumentException("must have at least one column");
         }
         this.columnHeaders = columnHeaders.clone();
         this.rows = new ArrayList<Object[]>();

@@ -1,7 +1,12 @@
 package rts.core.engine;
 
+import java.awt.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.PriorityQueue;
+import java.util.Iterator;
+import java.util.Collections;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Font;
@@ -22,9 +27,7 @@ import de.matthiasmann.twl.Widget;
 import rts.core.Game;
 import rts.core.engine.ingamegui.GuiInGame;
 import rts.core.engine.layers.Layer;
-import rts.core.engine.layers.entities.ActiveEntity;
-import rts.core.engine.layers.entities.IEntity;
-import rts.core.engine.layers.entities.MoveableEntity;
+import rts.core.engine.layers.entities.*;
 import rts.core.engine.layers.entities.buildings.Building;
 import rts.core.engine.layers.entities.effects.EffectManager;
 import rts.core.engine.layers.entities.others.CountDown;
@@ -36,6 +39,8 @@ import rts.utils.Configuration;
 import rts.utils.ResourceManager;
 import rts.utils.Timer;
 import rts.views.View;
+
+import static java.lang.Math.abs;
 
 /**
  * The entry point to all game mechanics.
@@ -69,7 +74,13 @@ public class Engine extends View {
 	private Timer loadGameTimer;
 	private Timer exitTimer;
 	private Image gameOverImage;
-	private Image gameWinImage;
+
+    //TRUNG NGUYEN
+    public PlayerInput getInput() {
+        return input;
+    }
+
+    private Image gameWinImage;
 	private int currentRound;
 	private int xScrollDecal;
 	private int yScrollDecal;
@@ -131,33 +142,91 @@ public class Engine extends View {
 		}
 		GameMusic.stopMusic();
 		GameMusic.loopMainTheme();
-		game.enterState(Game.NETWORK_VIEW_ID, new FadeOutTransition(), new FadeInTransition());
+        try {
+            game.getNetworkManager().createServer();
+            game.getNetworkManager().joinServer("localhost");
+            game.enterState(Game.CREATE_VIEW_ID, new FadeOutTransition(), new FadeInTransition());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 	}
+
+    public void mainMenu() {
+        if (isNetwork) {
+            netManager.stopClient();
+            if (netManager.isServer()) {
+                netManager.stopServer();
+            }
+        }
+        GameMusic.stopMusic();
+        GameMusic.loopMainTheme();
+        game.enterState(Game.MAIN_MENU_VIEW_ID, new FadeOutTransition(), new FadeInTransition());
+    }
+
+    public void tutorialMenu() {
+        if (isNetwork) {
+            netManager.stopClient();
+            if (netManager.isServer()) {
+                netManager.stopServer();
+            }
+        }
+        GameMusic.stopMusic();
+        GameMusic.loopMainTheme();
+        try {
+            game.getNetworkManager().createServer();
+            game.getNetworkManager().joinServer("localhost");
+            game.enterState(Game.TUTORIAL_VIEW_ID, new FadeOutTransition(), new FadeInTransition());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 	@Override
 	public void initTwlComponent() {
 		igmWidget = new Widget();
-		igmWidget.setSize(220, 70);
+		igmWidget.setSize(200, 220);
 		igmWidget.setPosition(container.getWidth() / 2 - 110, container.getHeight() / 2 - 35);
 
-		Label label = new Label("Do you really want to exit ?");
-		label.setPosition(20, 20);
+		Label label = new Label("Exit");
+		label.setPosition(85, 20);
 		igmWidget.add(label);
 
-		Button yesButton = new Button("Yes");
-		yesButton.setSize(30, 20);
-		yesButton.setPosition(20, 35);
-		yesButton.addCallback(new Runnable() {
-			@Override
-			public void run() {
-				exit();
-			}
-		});
-		igmWidget.add(yesButton);
+		Button mainButton = new Button("Main Menu");
+        mainButton.setSize(100, 20);
+        mainButton.setPosition(30, 45);
+        mainButton.addCallback(new Runnable() {
+            @Override
+            public void run() {
+                mainMenu();
+            }
+        });
+        igmWidget.add(mainButton);
 
-		Button noButton = new Button("No");
-		noButton.setSize(30, 20);
-		noButton.setPosition(120, 35);
+        Button yesButton = new Button("Campaign Menu");
+        yesButton.setSize(100, 20);
+        yesButton.setPosition(30, 85);
+        yesButton.addCallback(new Runnable() {
+            @Override
+            public void run() {
+                exit();
+            }
+        });
+        igmWidget.add(yesButton);
+
+        Button tutorialButton = new Button("Tutorial Menu");
+        tutorialButton.setSize(100, 20);
+        tutorialButton.setPosition(30, 125);
+        tutorialButton.addCallback(new Runnable() {
+            @Override
+            public void run() {
+                tutorialMenu();
+            }
+        });
+        igmWidget.add(tutorialButton);
+
+		Button noButton = new Button("Cancel");
+		noButton.setSize(100, 20);
+		noButton.setPosition(30, 165);
 		noButton.addCallback(new Runnable() {
 			@Override
 			public void run() {
@@ -198,6 +267,7 @@ public class Engine extends View {
 	@Override
 	public void render(GameContainer container, StateBasedGame game, Graphics g) throws SlickException {
 		g.setFont(inGameFont);
+
 		if (!loadGameTimer.isTimeComplete()) {
 			g.setColor(Color.red);
 			g.drawString("Load game, please wait...", container.getWidth() / 2 - 120, container.getHeight() / 2 - 30);
@@ -291,10 +361,10 @@ public class Engine extends View {
 		// UPDATE MOUSE MOVE AND CLICK
 		input.update(container, gui.isMouseOnGui(container, mx, my), mx, my, -xScrollDecal, -yScrollDecal);
 
-		// Mettre à 0 le nombres d'entités
+		// Mettre ï¿½ 0 le nombres d'entitï¿½s
 		resetEntsCount();
 
-		// Mettre à jour toutes les couches
+		// Mettre ï¿½ jour toutes les couches
 		for (int i = 0; i < layers.size(); i++) {
 			layers.get(i).updateAll(container, delta);
 		}
@@ -302,7 +372,7 @@ public class Engine extends View {
 		// UPDATE CURRENT ROUND
 		rounds.get(currentRound).update(this, delta);
 
-		// Si la partie est en réseau
+		// Si la partie est en rï¿½seau
 		if (isNetwork) {
 			netManager.update();
 		}
@@ -388,6 +458,14 @@ public class Engine extends View {
 				if (!gameWin) {
 					exitTimer.resetTime();
 					gameWin = true;
+                    if (checkUnlock())                             //if it's true that the next map should be unlock, add 1 to number of unlocked maps for current profile
+                    {
+                        int k =  Configuration.getProgress(Configuration.getProfile1());
+                        k++;
+                        Configuration.setProgress(Configuration.getProfile1(), k);
+                        game.getStateByIndex(6).initResources();                         //update CreateView
+                        game.getStateByIndex(6).initTwlComponent();
+                    }
 				}
 			}
 		} else {
@@ -399,6 +477,28 @@ public class Engine extends View {
 			getMap().init(this);
 		}
 	}
+
+    public boolean checkUnlock()             //check if the next map should be unlocked upon gameWin
+    {
+        boolean result = false;
+
+        ArrayList<Map> maps = new ArrayList<Map>(ResourceManager.getAllMaps().values());     //maps = all maps in resources
+        Collections.sort(maps);                                                              //order of maps in CreateView (campaign menu)
+        int correctMap = 0;
+        for (int i = 0; i < maps.size(); i++)
+        {
+            if (maps.get(i).getName() == getMap().getName())
+            {
+                correctMap = i;                                                 //number of the current map as listed in CreateView
+            }
+        }
+        if(correctMap == Configuration.getProgress(Configuration.getProfile1()) - 1)   //if current map is the last map that was last unlocked, result is true
+        {
+               result = true;
+        }
+
+        return result;
+    }
 
 	// Count Down
 	public void removeCountDown(CountDown countDown) {
@@ -491,6 +591,58 @@ public class Engine extends View {
 			layers.get(i).selectEntitiesBetween((sx <= mx) ? sx : mx, (sy <= my) ? sy : my, (sx > mx) ? sx : mx, (sy > my) ? sy : my);
 		}
 	}
+
+    private int getTypeFromName(String unitName) {
+        int type = -1;
+        for(int i = 0; i < EData.NAMES.length; i++) {
+            if(EData.NAMES[i].equals(unitName)) {
+                type = i;
+                break;
+            }
+        }
+        return type;
+    }
+
+    /**
+     * Creates a priority queue of all the player's active entities based on shortest distance
+     * @param tileX - point to select close to
+     * @param tileY
+     */
+    public ArrayList<ActiveEntity> selectClosestEntities(int tileX, int tileY, float radius, int numUnits, String unitType){
+        PriorityQueue<ActiveEntity> allEnts =
+                new PriorityQueue<ActiveEntity>(10, new ActiveEntityComparator(new Point(tileX, tileY)));
+        int wantedUnitType = unitType == null ? -1 : getTypeFromName(unitType);
+        for (int i = 0; i < layers.size(); i++) {
+            for(int j = 0; j < layers.get(i).getArray().size(); j++){
+                if(layers.get(i).getArray().get(j) instanceof ActiveEntity){
+                    ActiveEntity currentUnit = (ActiveEntity) layers.get(i).getArray().get(j);
+                    if(currentUnit.getPlayerId() == this.getPlayer().getId() && (unitType == null || wantedUnitType == currentUnit.getType())) {
+                        allEnts.add(currentUnit);
+                    }
+                }
+            }
+        }
+        ArrayList<ActiveEntity> selectedUnits = new ArrayList<ActiveEntity>();
+        Iterator<ActiveEntity> iter = allEnts.iterator();
+        for(int i = 0; i < numUnits; i++){
+            if(iter.hasNext()){
+                ActiveEntity currentUnit = iter.next();
+                float currentTileX = currentUnit.getX()/getTileW();
+                float currentTileY = currentUnit.getX()/getTileW();
+                // get units less than radius number of tiles away
+                double distanceFromPoint = Math.pow(currentTileX - tileX, 2) + Math.pow(currentTileY - tileY, 2);
+                if(distanceFromPoint > Math.pow(radius, 2))
+                {
+                    // note that once we find one that's not in the distance, we can break
+                    // because all the other ones have a greater radius
+                    break;
+                }
+                selectedUnits.add(currentUnit);
+                currentUnit.selected();
+            }
+        }
+        return selectedUnits;
+    }
 
 	public ArrayList<ActiveEntity> getPlayerSelectedEntities() {
 		ArrayList<ActiveEntity> a = new ArrayList<ActiveEntity>();

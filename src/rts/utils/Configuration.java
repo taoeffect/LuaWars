@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Properties;
 
 /**
@@ -18,6 +19,7 @@ public class Configuration {
 
 	private static String fileLocation;
 	private static Properties configurationFile;
+    private ArrayList<String> location;
 
 	/**
 	 * Initialize the configuration file with the given path.
@@ -28,8 +30,8 @@ public class Configuration {
 	 *             If the file can't be loaded.
 	 */
 	public static void init(String fileLocation) throws IOException {
-		Configuration.fileLocation = fileLocation;
-		updateConfigFile();
+            Configuration.fileLocation = fileLocation;
+		    updateConfigFile();
 	}
 
 	/**
@@ -59,7 +61,62 @@ public class Configuration {
 	}
 
 	// Getters and Setters
-
+    /**
+     * Get the game profile Name.
+     */
+    public static String getName1()
+    {
+        return configurationFile.getProperty("name1", "Player");
+    }
+    /**
+     * Set the game profile Name
+     */
+    public static void setName1(String name)
+    {
+        configurationFile.setProperty("name1",name);
+    }
+    /**
+     * Get the game profile Name.
+     */
+    public static String getName2()
+    {
+        return configurationFile.getProperty("name2", "Player");
+    }
+    /**
+     * Set the game profile Name
+     */
+    public static void setName2(String name)
+    {
+        configurationFile.setProperty("name2",name);
+    }
+    /**
+     * Get the game profile Name.
+     */
+    public static String getName3()
+    {
+        return configurationFile.getProperty("name3", "Player");
+    }
+    /**
+     * Set the game profile Name
+     */
+    public static void setName3(String name)
+    {
+        configurationFile.setProperty("name3",name);
+    }
+    /**
+     * Get the game frame Number.
+     */
+    public static int getNum()
+    {
+        return Integer.parseInt(configurationFile.getProperty("number", "0"));
+    }
+    /**
+     * Set the file Number
+     */
+    public static void setNum(int number)
+    {
+        configurationFile.setProperty("number", number + "");
+    }
 	/**
 	 * Get the game frame width.
 	 */
@@ -303,5 +360,78 @@ public class Configuration {
 	public static void setUdpListeningClientPort(int port) {
 		configurationFile.setProperty("udpListeningClientPort", port + "");
 	}
+
+    /**
+     * Get the current Profile.
+     *
+     *
+     */
+    public static String getProfile1() {
+        return configurationFile.getProperty("profile1", "Default");
+    }
+
+    /**
+     * Set the current Profile.
+     *
+     *  HAS TO BE THE NAME OF AN EXISTING PROFILE
+     *
+     */
+    public static void setProfile1(String profile) {
+        configurationFile.setProperty("profile1", profile + "");
+    }
+    /**
+     * Get the current Profile.
+     *
+     *
+     */
+    public static String getProfile2() {
+        return configurationFile.getProperty("profile2", "Default");
+    }
+
+    /**
+     * Set the current Profile.
+     *
+     *  HAS TO BE THE NAME OF AN EXISTING PROFILE
+     *
+     */
+    public static void setProfile2(String profile) {
+        configurationFile.setProperty("profile2", profile + "");
+    }
+
+    /**
+     * Get the current Profile.
+     *
+     *
+     */
+    public static String getProfile3() {
+        return configurationFile.getProperty("profile3", "Default");
+    }
+
+    /**
+     * Set the current Profile.
+     *
+     *  HAS TO BE THE NAME OF AN EXISTING PROFILE
+     *
+     */
+    public static void setProfile3(String profile) {
+        configurationFile.setProperty("profile3", profile + "");
+    }
+
+    /**
+     * Get the current profile's Progress.
+     */
+    public static int getProgress(String profile) {
+        return Integer.parseInt(configurationFile.getProperty(profile, "1"));
+    }
+
+    /**
+     * Set the current profile's Progress.
+     *
+     * CANNOT BE LARGER THAN THE AMOUNT OF MAPS IN THE GAME
+     *
+     */
+    public static void setProgress(String profile, int progress) {
+        configurationFile.setProperty(profile, progress + "");
+    }
 
 }

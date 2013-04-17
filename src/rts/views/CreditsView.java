@@ -42,68 +42,68 @@ public class CreditsView extends View {
 		w.setSize(300, 480);
 		w.setPosition(x - 150, y - 240);
 		
-		Label l = new Label("--- CONCEPTION/DEVELOPMENT ---");
+		Label l = new Label("--- LuaWars Development Team ---");
 		l.setPosition(44, 35);
 		w.add(l);
 		
-		l = new Label("Vin789");
-		l.setPosition(125, 65);
+		l = new Label("Greg Slepak");
+		l.setPosition(110, 85);
 		w.add(l);
 		
-		l = new Label("--- SPRITES/DESIGNS ---");
-		l.setPosition(74, 95);
+		l = new Label("Austin Baylis");
+		l.setPosition(110, 125);
 		w.add(l);
 		
-		l = new Label("Hard Vacuum From Lost Garden");
-		l.setPosition(50, 120);
+		l = new Label("Max Ussin");
+		l.setPosition(110, 160);
 		w.add(l);
 		
-		l = new Label("Mr Qqn");
-		l.setPosition(125, 150);
+		l = new Label("David Garcia");
+		l.setPosition(110, 200);
 		w.add(l);
 		
-		l = new Label("Vin789");
-		l.setPosition(125, 180);
+		l = new Label("Trung Nguyen");
+		l.setPosition(110, 240);
 		w.add(l);
 		
-		l = new Label("--- SOUNDS/MUSICS ---");
+		l = new Label("");
 		l.setPosition(78, 210);
 		w.add(l);
 		
+		l = new Label("--- Also Thanks To ---");
+		l.setPosition(90, 340);
+		w.add(l);
+		
+		l = new Label("Vin789");
+		l.setPosition(60, 360); // 330
+		w.add(l);
+		
+		l = new Label("Mr Qqn");
+		l.setPosition(130, 360);
+		w.add(l);
+		
 		l = new Label("Karam");
-		l.setPosition(128, 240);
-		w.add(l);
-		
-		l = new Label("--- API ---");
-		l.setPosition(119, 270); // 330
-		w.add(l);
-		
-		l = new Label("Slick 2D");
-		l.setPosition(126, 300);
-		w.add(l);
-		
-		l = new Label("TWL + Eforen");
-		l.setPosition(108, 330);
+		l.setPosition(210, 360);
 		w.add(l);
 		
 		l = new Label("Kryo");
-		l.setPosition(134, 360);
+		l.setPosition(60, 380);
 		w.add(l);
 		
-		l = new Label("--- TEST/DEBUGS ---");
-		l.setPosition(90, 390);
-		w.add(l);
 		l = new Label("Sisko");
-		l.setPosition(134, 420);
+		l.setPosition(130, 380);
+		w.add(l);
+		l = new Label("Yoro");
+		l.setPosition(210, 380);
 		w.add(l);
 		
-		l = new Label("Yoro");
-		l.setPosition(136, 450);
+		l = new Label("Lostgarden.com");
+		l.setPosition(60, 410);
 		w.add(l);
 		
 		root.add(w);
 		
-		Button exitButton = new Button("Exit");
+		Button exitButton = new Button("Back");
 		exitButton.setSize(70, 30);
 		exitButton.setPosition(x - 350, y + 250);
 		exitButton.addCallback(new Runnable() {

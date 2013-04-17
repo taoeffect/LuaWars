@@ -2,6 +2,7 @@ package rts;
 
 import java.io.IOException;
 
+import org.luawars.LuaJScripting.CallLua;
 import org.luawars.Log;
 import org.newdawn.slick.SlickException;
 
@@ -16,17 +17,21 @@ import javax.swing.*;
  * 
  */
 public class Launch {
-
+    public static Game g;
 	public static void main(String[] args) {
-        if (System.getenv("DEBUG") != null)
-            Log.currentLevel = Log.DEBUG;
-        try {
-            new Game("lib/resources.jar", "config/config.properties").launch();
-        } catch (SlickException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-    }
+		try {
+            if (System.getenv("DEBUG") != null)
+                Log.currentLevel = Log.LEVEL.DEBUG;
+			g = new Game("lib/resources.jar", "config/config.properties");
 
+            // if you don't understand this line, read this: http://www.lua.org/pil/8.1.html
+            CallLua.initLuaPath("?.lua;?/?.lua;?/?/?.lua;resources/Lua Scripts/?.lua");
+
+            g.launch();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (SlickException e) {
+			e.printStackTrace();
+		}
+	}
 }

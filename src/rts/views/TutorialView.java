@@ -1,7 +1,5 @@
 package rts.views;
 
-
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,11 +52,16 @@ import de.matthiasmann.twl.model.ListModel;
 import de.matthiasmann.twl.model.SimpleChangableListModel;
 import de.matthiasmann.twl.model.SimpleIntegerModel;
 
-
-
-public class CreateView extends View {
-
-        class ChatArea extends HTMLTextAreaModel {
+/**
+ * Created with IntelliJ IDEA.
+ * User: Maximus
+ * Date: 4/5/13
+ * Time: 5:00 PM
+ * To change this template use File | Settings | File Templates.
+ */
+public class TutorialView extends View
+{
+    class ChatArea extends HTMLTextAreaModel {
         String html;
 
         ChatArea(String s) { super(s); }
@@ -79,17 +82,22 @@ public class CreateView extends View {
     private int playerPosition;
     private Timer switchTimer;
     private ArrayList<Map> maps;
+    private ArrayList<String> tutorials;
     private int totalMaps;
     private NetworkManager netManager;
     private Image background;
     private Image title;
+
+    private int numTutorials = 3;        //number of tutorials now created, currently 3
 
     // GUI
 
     // Server Panel
     private Widget serverPanel;
     private ListBox<Map> mapList;
+    private ListBox<String> tutorialList;
     private SimpleChangableListModel<Map> mapListModel;
+    private SimpleChangableListModel<String> tutorialListModel;
     private ComboBox<String> comboTecLevel;
     private SimpleChangableListModel<String> comboTecLevelModel;
     private ComboBox<String> comboMoney;
@@ -107,20 +115,21 @@ public class CreateView extends View {
     private Button exitButton;
     private Button launchButton;
 
-    public CreateView() {
+    public TutorialView() {
         playerPosition = -1;
     }
 
     @Override
     public void initResources() {
-        background = ResourceManager.getImage("create_view_background");
-        title = ResourceManager.getSpriteSheet("menutitles").getSprite(0, 1);
+        background = ResourceManager.getImage("tutorial_view_background");
+        title = ResourceManager.getSpriteSheet("menutitles").getSprite(0, 0);
         maps = new ArrayList<Map>(ResourceManager.getAllMaps().values());
+        tutorials = new ArrayList<String>();
         Collections.sort(maps);
         totalMaps = maps.size();
 
-        //remove the maps not yet unlocked by the current profile
-        int delete = maps.size() - Configuration.getProgress(Configuration.getProfile1());
+        //remove maps not being used in tutorials
+        int delete = maps.size() - numTutorials;
         if (delete >= 0)
         {
             while(delete != 0)
@@ -178,18 +187,36 @@ public class CreateView extends View {
 
         // Server panel
         serverPanel = new Widget();
-        serverPanel.setPosition(x, y);
+        serverPanel.setPosition(x + 120, y);
         serverPanel.setSize(400, 430);
 
-        Label l = new Label("Select a map:              " + maps.size() + "/" + totalMaps + " Maps Unlocked");
+        Label l = new Label("Select a tutorial: ");
         l.setPosition(20, 24);
         serverPanel.add(l);
+
+        for(int k = 0; k < numTutorials; k++)
+        {
+           tutorials.add(new String("Tutorial " + k));
+        }
+        tutorialListModel = new SimpleChangableListModel<String>(tutorials);
+        tutorialList =  new ListBox<String>(tutorialListModel);
+        tutorialList.setPosition(20, 40);
+        tutorialList.setSize(360, 350);
+        tutorialList.setSelected(0);
+        tutorialList.addCallback(new CallbackWithReason<CallbackReason>() {
+            @Override
+            public void callback(CallbackReason arg0) {
+                sendServerInfos();
+            }
+        });
+        serverPanel.add(tutorialList);
 
         mapListModel = new SimpleChangableListModel<Map>(maps);
         mapList = new ListBox<Map>(mapListModel);
         mapList.setPosition(20, 40);
         mapList.setSize(360, 350);
         mapList.setSelected(0);
+        mapList.setVisible(false);
         mapList.addCallback(new CallbackWithReason<CallbackReason>() {
             @Override
             public void callback(CallbackReason arg0) {
@@ -198,7 +225,7 @@ public class CreateView extends View {
         });
         serverPanel.add(mapList);
 
-        l = new Label("Tec level:");
+        l = new Label("");
         l.setPosition(20, 400);
         serverPanel.add(l);
 
@@ -213,9 +240,10 @@ public class CreateView extends View {
                 sendServerInfos();
             }
         });
+        comboTecLevel.setVisible(false);
         serverPanel.add(comboTecLevel);
 
-        l = new Label("Start Money:");
+        l = new Label("");
         l.setPosition(200, 400);
         serverPanel.add(l);
 
@@ -233,27 +261,20 @@ public class CreateView extends View {
         comboMoney.setPosition(300, 390);
         comboMoney.setSize(80, 20);
         comboMoney.setSelected(1);
+        comboMoney.setVisible(false);
         serverPanel.add(comboMoney);
 
 
         root.add(serverPanel);
 
-        // Map panel
-
-        mapPanel = new Widget();
-        mapPanel.setPosition(x + 475, y);
-        mapPanel.setSize(250, 270);
-
-        root.add(mapPanel);
-
-        // Client Panel
+               // Client Panel
 
         clientTable = new Table();
         tableModel = new ClientTableModel();
         tableModel.registerTableCellRender(clientTable);
         clientTable.setModel(tableModel);
         clientTable.setSize(410, 200);
-        clientTable.setPosition(x - 3, 450 + y);
+        clientTable.setPosition(x+115, 450 + y);
         clientTable.setDefaultSelectionManager();
         root.add(clientTable);
 
@@ -270,23 +291,19 @@ public class CreateView extends View {
                     netManager.stopServer();
                 }
                 netManager.stopClient();
-                CreateView.this.game.enterState(Game.MAIN_MENU_VIEW_ID, new FadeOutTransition(), new FadeInTransition());
+                TutorialView.this.game.enterState(Game.MAIN_MENU_VIEW_ID, new FadeOutTransition(), new FadeInTransition());
             }
         });
         root.add(exitButton);
 
         launchButton = new Button("Launch");
         launchButton.setSize(70, 30);
-        launchButton.setPosition(540 + x, y + 350);
+        launchButton.setPosition(540 + x, y + 500);
         launchButton.setVisible(false);
         launchButton.addCallback(new Runnable() {
             @Override
             public void run() {
-                if (mapList.getSelected() == Configuration.getProgress(Configuration.getProfile1()) - 1)
-                {
-                    comboTecLevel.setSelected(0);
-                    comboMoney.setSelected(1);
-                }
+                mapList.setSelected(tutorialList.getSelected());
                 netManager.launchGame();
             }
         });
@@ -296,17 +313,19 @@ public class CreateView extends View {
     }
 
     @Override
+
     public void render(GameContainer container, StateBasedGame game, Graphics g) throws SlickException {
         g.drawImage(background, 0, 0);
         super.render(container, game, g);
-        Map m = maps.get(mapList.getSelected());
+        //Map m = maps.get(mapList.getSelected());
         int x = container.getWidth() / 2 - 370;
         int y = container.getHeight() / 2 - 250;
         g.drawImage(title, x + 170, y - 40);
         g.setColor(Color.white);
-        g.drawString("(" + m.getWidthInPixel() + "*" + m.getHeightInPixel() + ")", x + 545, y + 22);
-        m.renderMiniMap(g, 500 + x, y + 45, 200, 200, true);
+        //g.drawString("(" + m.getWidthInPixel() + "*" + m.getHeightInPixel() + ")", x + 545, y + 22);
+        //m.renderMiniMap(g, 500 + x, y + 45, 200, 200, false);
     }
+
 
     @Override
     public void update(GameContainer container, StateBasedGame game, int delta) throws SlickException {
@@ -315,7 +334,7 @@ public class CreateView extends View {
 
     @Override
     public int getID() {
-        return Game.CREATE_VIEW_ID;
+        return Game.TUTORIAL_VIEW_ID;
     }
 
     // Networks methods
@@ -349,7 +368,7 @@ public class CreateView extends View {
             if (changeMap && playerPosition >= ss.nbMaxPlayer) {
                 // Player is ejected because the new map didn't have enough row
                 netManager.stopClient();
-                CreateView.this.game.enterState(Game.NETWORK_VIEW_ID, new FadeOutTransition(), new FadeInTransition());
+                TutorialView.this.game.enterState(Game.NETWORK_VIEW_ID, new FadeOutTransition(), new FadeInTransition());
             } else {
                 comboTecLevel.setSelected(ss.tecLevel);
                 comboMoney.setSelected(ss.startMoney);
@@ -995,6 +1014,3 @@ public class CreateView extends View {
     }
 
 }
-
-
-
