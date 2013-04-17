@@ -32,6 +32,8 @@ public class Launch {
 			e.printStackTrace();
 		} catch (SlickException e) {
 			e.printStackTrace();
-		}
+		} catch (Throwable e) {
+            e.printStackTrace();
+        }
 	}
 }

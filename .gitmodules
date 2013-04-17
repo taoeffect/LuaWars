@@ -1,0 +1,3 @@
+[submodule "jEdit"]
+	path = jEdit
+	url = git://github.com/austinbaylis/jEdit.git

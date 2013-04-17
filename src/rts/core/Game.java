@@ -3,8 +3,8 @@ package rts.core;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.gjt.sp.jedit.jEdit;
 import org.luawars.Log;
-import org.luawars.gui.MainPanel;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.*;
@@ -31,6 +31,8 @@ import rts.views.View;
 import javax.swing.*;
 import rts.views.TutorialView;
 import rts.views.ProfileView;
+
+import static org.gjt.sp.jedit.jEdit.jEdit_init;
 
 /**
  * The main game class, contain the view lists and the launch process.
@@ -150,19 +152,25 @@ public class Game extends StateBasedGame {
 
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                JFrame frame = new JFrame("Lua Wars");
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                MainPanel panel = new MainPanel();
-                // TODO: make it so that container.getWidth() is used instead and works
+//                JFrame frame = new JFrame("Lua Wars");
+//                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//                MainPanel panel = new MainPanel();
+//                // TODO: make it so that container.getWidth() is used instead and works
                 Log.debug("Setting container size: "+Configuration.getWidth()+"w "+Configuration.getHeight()+"h");
                 can.setSize(Configuration.getWidth(), Configuration.getHeight());
-                panel.splitPane.setRightComponent(can);
-                frame.setContentPane(panel.panel);
-                frame.pack();
-                frame.setVisible(true);
+                //panel.splitPane.setRightComponent(can);
+                JPanel pan = new JPanel();
+                pan.add(can);
+                jEdit_init(pan);
+//                frame.setContentPane(panel.panel);
+//                frame.pack();
+//                frame.setVisible(true);
             }
         });
+
+        while (!jEdit.STARTUPISDONE) try { Thread.sleep(100); } catch (Exception e) { e.printStackTrace(); }
         // Start the game
+        Log.debug("!!!!!!!!!! jEdit done!");
 		can.start();
 
         // TODO: fix this exception when clicking 'Exit'
