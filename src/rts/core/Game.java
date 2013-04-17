@@ -239,7 +239,7 @@ Exception in thread "AWT-EventQueue-0" java.lang.IllegalStateException: Mouse mu
 			lwjglRenderer = new LWJGLRenderer();
 			lwjglRenderer.setUseSWMouseCursors(true);
 			theme = ThemeManager.createThemeManager(Thread.currentThread().getContextClassLoader().getResource(THEME_PATH), lwjglRenderer);
-			gui = new GUI(lwjglRenderer);
+            gui = new GUI(lwjglRenderer);
 			gui.applyTheme(theme);
 		} catch (LWJGLException e) {
 			e.printStackTrace();
