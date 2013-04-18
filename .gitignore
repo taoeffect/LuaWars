@@ -1,6 +1,7 @@
 .idea/workspace.xml
 .idea/misc.xml
 lib/resources.jar
+out/
 
 *.class
 
