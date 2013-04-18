@@ -13,6 +13,7 @@ import org.luawars.Log;
 import rts.Launch;
 import rts.core.engine.ingamegui.GuiButton;
 import rts.core.engine.ingamegui.GuiPanel;
+import rts.core.engine.map.Map;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -289,6 +290,15 @@ public class CallLua extends TwoArgFunction {
         public LuaValue call() {
             Launch.g.getEngine().getInput().setUpBase();
             return NIL;
+        }
+    }
+
+    public static class clock extends ZeroArgFunction
+    {
+        public LuaValue call()
+        {
+            long gameTime = System.currentTimeMillis() - Map.startTime;
+            return LuaValue.valueOf(gameTime);
         }
     }
 }
