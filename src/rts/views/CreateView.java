@@ -270,7 +270,7 @@ public class CreateView extends View {
                     netManager.stopServer();
                 }
                 netManager.stopClient();
-                CreateView.this.game.enterState(Game.MAIN_MENU_VIEW_ID, new FadeOutTransition(), new FadeInTransition());
+                CreateView.this.game.enterState(Game.PROFILE_VIEW_ID, new FadeOutTransition(), new FadeInTransition());
             }
         });
         root.add(exitButton);
