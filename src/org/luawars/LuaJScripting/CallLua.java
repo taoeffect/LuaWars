@@ -96,21 +96,25 @@ public class CallLua extends TwoArgFunction {
         Log.debug("LUA_PATH set to {}", G.package_.path);
     }
 
-    /**
-     * General method to run a Lua script.
-     * Note: run script must be called before you can call callFunction.
-     * I'm not exactly sure why. I think it is because Lua puts all the functions' addresses on a table by
-     * calling runScript, and once the functions are on a table, calling a function will make Lua
-     * look at the table to see what address to go to
-     *
-     * @param scriptFileName - script to run
-     * @return
-     */
+    public static LuaValue runScript(String fileNameWithPath) {
+        return runScript(fileNameWithPath, "");
+    }
+        /**
+         * General method to run a Lua script.
+         * Note: run script must be called before you can call callFunction.
+         * I'm not exactly sure why. I think it is because Lua puts all the functions' addresses on a table by
+         * calling runScript, and once the functions are on a table, calling a function will make Lua
+         * look at the table to see what address to go to
+         *
+         * @param scriptFileName - script to run
+         * @return
+         */
     public static LuaValue runScript(String scriptFileName, String folderPath) {
         Log.trace("running script {}", scriptFileName);
         try {
             if(folderPath == null) {
-                folderPath = "resources/Lua Scripts/";
+                //folderPath = "resources/Lua Scripts/";
+                folderPath = "C:/Users/Trung/Documents/GitHub/LuaWars/resources/Lua Scripts/";
             }
 
             String tempScriptFileName = scriptFileName;
@@ -121,7 +125,7 @@ public class CallLua extends TwoArgFunction {
             // to see how to use lua parser look at this
             //https://github.com/headius/luaj/blob/master/README.html
             // scroll down to parser section
-            //System.out.println(folderPath + scriptFileName);
+            System.out.println("Calling " + folderPath + scriptFileName);
             LuaParser parser = new LuaParser(new FileInputStream(folderPath + scriptFileName));
             Chunk chunk = parser.Chunk();
             return G.loadFile(folderPath + scriptFileName).call();
