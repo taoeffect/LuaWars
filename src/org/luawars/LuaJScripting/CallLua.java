@@ -92,6 +92,9 @@ public class CallLua extends TwoArgFunction {
         Log.debug("LUA_PATH set to {}", G.package_.path);
     }
 
+    public static LuaValue runScript(String fileNameWithPath) {
+        return runScript(fileNameWithPath, "");
+    }
     /**
      * General method to run a Lua script.
      * Note: run script must be called before you can call callFunction.
