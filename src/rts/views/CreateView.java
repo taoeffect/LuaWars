@@ -287,6 +287,7 @@ public class CreateView extends View {
                     comboTecLevel.setSelected(0);
                     comboMoney.setSelected(1);
                 }
+
                 netManager.launchGame();
             }
         });

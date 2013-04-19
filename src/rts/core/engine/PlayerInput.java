@@ -109,6 +109,25 @@ public class PlayerInput {
 		}
 	}
 
+    /*New function to attack or move all units*/
+    public void moveOrAttackAction(int x, int y)
+    {
+        ArrayList<ActiveEntity> selectedAllUnits = engine.selectAllUnits(x,y);
+        ArrayList<ActiveEntity> selectedAllEnemies = engine.selectAllEnemies(x,y);
+        moveOrSpecialAction(x, y);
+        for(ActiveEntity ae1 : selectedAllUnits)
+        {
+            for(ActiveEntity ae2 : selectedAllEnemies)
+            {
+                if(engine.DistanceOfUnit(ae1,ae2))
+                {
+                    ae1.target((ActiveEntity) ae2, (int)ae2.getX(), (int)ae2.getY());
+                }
+            }
+        }
+
+    }
+
 	public void moveOrSpecialAction(int mx, int my) {
 		ActiveEntity e = engine.getEntityAt(null, mx, my); // this is our enemy unit
 		if (e != null && !(engine.getMap().isEnableFow() && engine.getMap().fogOn(mx / engine.getTileW(), my / engine.getTileH()))) {

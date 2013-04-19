@@ -42,3 +42,7 @@ end
 function setUpBase()
     CallLua.setUpBase()
 end
+
+function selectUnitsAttack(tileX, tileY)
+    CallLua.setUpBase(tileX, tileY)
+end
