@@ -125,7 +125,7 @@ public class CallLua extends TwoArgFunction {
             // to see how to use lua parser look at this
             //https://github.com/headius/luaj/blob/master/README.html
             // scroll down to parser section
-            System.out.println("Calling " + folderPath + scriptFileName);
+            //System.out.println("Calling " + folderPath + scriptFileName);
             LuaParser parser = new LuaParser(new FileInputStream(folderPath + scriptFileName));
             Chunk chunk = parser.Chunk();
             return G.loadFile(folderPath + scriptFileName).call();

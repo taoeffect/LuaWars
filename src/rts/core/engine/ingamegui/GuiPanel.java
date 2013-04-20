@@ -39,10 +39,11 @@ public class GuiPanel {
 		}
 	}
 
-	public void mousePressed(int x, int y) {
+    // TO ADD MOUSE PRESSES BACK UNCOMMENT THIS
+    public void mousePressed(int x, int y) {
 		for (int i = 0; i < buttons.size(); i++) {
 			if (buttons.get(i).isMouseOver(x, y) && buttons.get(i).isEnable()) {
-				buttons.get(i).launchCreateEntityProcess();
+				//buttons.get(i).launchCreateEntityProcess();
 			}
 		}
 	}
