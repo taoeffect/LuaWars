@@ -3,10 +3,9 @@ package org.luawars.LuaJScripting;
 import org.luaj.vm2.*;
 import org.luaj.vm2.ast.Chunk;
 import org.luaj.vm2.lib.OneArgFunction;
-import org.luaj.vm2.lib.ThreeArgFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
-import org.luaj.vm2.lib.jse.*;
+import org.luaj.vm2.lib.jse.JsePlatform;
 import org.luaj.vm2.parser.LuaParser;
 import org.luaj.vm2.parser.ParseException;
 import org.luawars.Log;
@@ -31,6 +30,7 @@ import java.util.ArrayList;
  *
  * @TODO
  * attack/target
+ * being attacked
  * setting up base
  * set priorities
  * timing
@@ -77,6 +77,11 @@ public class CallLua extends TwoArgFunction {
         library.set("placeBuilding", new placeBuilding());
         library.set("setUpBase", new setUpBase());
         library.set("selectUnitsAttack", new selectUnitsAttack());
+        library.set("drawText", new drawText());
+        library.set("addPriority", new addPriority());
+        library.set("getTopPriority", new getTopPriority());
+        library.set("removeTopPriority", new removeTopPriority());
+        library.set("clearPriorities", new clearPriorities());
 
         env.set("org.luawars.LuaJScripting.CallLua", library);
 
@@ -114,16 +119,16 @@ public class CallLua extends TwoArgFunction {
 
             String tempScriptFileName = scriptFileName;
             // if it ends with .lua, then get rid of the .lua part
-            if(scriptFileName.endsWith(".lua")) {
-                tempScriptFileName = scriptFileName.substring(0, scriptFileName.length() - 4);
-            }
-            System.out.println("opening file " + tempScriptFileName);
+//            if(scriptFileName.endsWith(".lua")) {
+//                tempScriptFileName = scriptFileName.substring(0, scriptFileName.length() - 4);
+//            }
             // to see how to use lua parser look at this
             //https://github.com/headius/luaj/blob/master/README.html
             // scroll down to parser section
-            LuaParser parser = new LuaParser(new FileInputStream(folderPath + tempScriptFileName + ".lua"));
+            //System.out.println(folderPath + scriptFileName);
+            LuaParser parser = new LuaParser(new FileInputStream(folderPath + scriptFileName));
             Chunk chunk = parser.Chunk();
-            return G.loadFile(folderPath + tempScriptFileName + ".lua").call();
+            return G.loadFile(folderPath + scriptFileName).call();
             // if we want our game to put anything, then put error message displays here
         } catch(FileNotFoundException e) {
             System.out.println("FILE NOT FOUND");
@@ -147,19 +152,19 @@ public class CallLua extends TwoArgFunction {
      * @return
      */
     public static LuaValue callFunction(String functionName, LuaValue arg) {
-        Log.trace("Calling function {} with argument {}" , functionName, arg);
+        Log.trace("Calling function {} with argument {}", functionName, arg);
         return G.get(functionName).call(arg);
     }
 
     public static LuaValue callFunction(String functionName, LuaValue arg1, LuaValue arg2) {
         LuaValue[] args = {arg1, arg2};
-        Log.trace("Calling function {} with arguments {}" , functionName, args);
+        Log.trace("Calling function {} with arguments {}", functionName, args);
         return G.get(functionName).call(arg1, arg2);
     }
 
     public static LuaValue callFunction(String functionName, LuaValue arg1, LuaValue arg2, LuaValue arg3) {
         LuaValue[] args = {arg1, arg2, arg3};
-        Log.trace("Calling function {} with arguments {}" , functionName, args);
+        Log.trace("Calling function {} with arguments {}", functionName, args);
         return G.get(functionName).call(arg1, arg2, arg3);
     }
 
@@ -176,7 +181,7 @@ public class CallLua extends TwoArgFunction {
      */
     public static LuaValue callFunctionFromScript(String scriptFileName, String functionName, LuaValue arg) {
         String[] function = {scriptFileName, functionName};
-        Log.trace("Calling script function {} with argument {}" , function, arg);
+        Log.trace("Calling script function {} with argument {}", function, arg);
         G.loadFile(scriptFileName).call();
         return G.get(functionName).call(arg);
     }
@@ -184,7 +189,7 @@ public class CallLua extends TwoArgFunction {
     public static LuaValue callFunctionFromScript(String scriptFileName, String functionName, LuaValue arg1, LuaValue arg2) {
         String[] function = {scriptFileName, functionName};
         LuaValue[] args = {arg1, arg2};
-        Log.trace("Calling script function {} with arguments {}" , function, args);
+        Log.trace("Calling script function {} with arguments {}", function, args);
         G.loadFile(scriptFileName).call();
         return G.get(functionName).call(arg1, arg2);
     }
@@ -192,7 +197,7 @@ public class CallLua extends TwoArgFunction {
     public static LuaValue callFunctionFromScript(String scriptFileName, String functionName, LuaValue arg1, LuaValue arg2, LuaValue arg3) {
         String[] function = {scriptFileName, functionName};
         LuaValue[] args = {arg1, arg2, arg3};
-        Log.trace("Calling script function {} with arguments {}" , function, args);
+        Log.trace("Calling script function {} with arguments {}", function, args);
         G.loadFile(scriptFileName).call();
         return G.get(functionName).call(arg1, arg2, arg3);
     }
@@ -231,7 +236,6 @@ public class CallLua extends TwoArgFunction {
         // NOTE: THIS COULD MESS UP BECAUSE THERE ARE MULTIPLE UNITS THAT HAVE THE NAME BUILDER,
         // LIKEWISE THERE ARE MULTIPLE UNITS WITH THE NAME SCOUT
         public LuaValue call(LuaValue tileX, LuaValue tileY, LuaValue radius, LuaValue numUnits, LuaValue unitType, LuaValue NIL1, LuaValue NIL2) {
-            System.out.println("running java.selectUnits()");
             // make it return a list of the selected units
             // right now selectUnitsAt returns an arraylist of active entities
             // might need to convert them into a lua list
@@ -261,17 +265,47 @@ public class CallLua extends TwoArgFunction {
         // however moveOrSpecialAction takes in x, y coordinates (i.e. pixel coordinates)
         // so we need to convert the tiles to pixel coordinates
         public LuaValue call(LuaValue tileX, LuaValue tileY) {
-            System.out.println("running java.moveUnits()");
             Launch.g.getEngine().getInput().moveOrSpecialAction(tileX.toint() * Launch.g.getEngine().getTileW(), tileY.toint() * Launch.g.getEngine().getTileH());
             return NIL;
         }
     }
 
+    /**
+     * Returns a global variable for the player to use
+     * Also updates all the global variables when called
+     */
     public static class getLuaJGlobal extends OneArgFunction {
         public LuaValue call(LuaValue globalVarName) {
             if(LuaJGlobal.luaJGlobal.get(globalVarName.tojstring()) != null)
             {
-                return LuaValue.valueOf(LuaJGlobal.luaJGlobal.get(globalVarName.tojstring()).intValue());
+                // updates which stuff is building
+                // NOTE: THIS ASSUMES THAT ONLY ONE THING IS BUILDING FOR EACH PANEL
+                // AND THERE AREN'T ANY BUILDINGS/UNITS IN THE WAITING LIST
+                ArrayList<GuiPanel> panels = Launch.g.getEngine().getGui().getMenuGui().getPanels();
+                // i only want to check if a building is being built when this is called
+                for(int i = 0; i < panels.size(); i++) {
+                    ArrayList<GuiButton> buttons = Launch.g.getEngine().getGui().getMenuGui().getPanels().get(i).getButtons();
+                    boolean panelCurrentlyBuilding = false;
+                    for(int j = 0; j < buttons.size(); j++) {
+                        if(buttons.get(j).hasProcessReady()) {
+                            panelCurrentlyBuilding = true;
+                            LuaJGlobal.addNewLuaJGlobal("buildingPanel" + i, LuaInteger.valueOf(j));
+                            LuaJGlobal.addNewLuaJGlobal("buildingPanelReady" + i, LuaInteger.valueOf(j));
+                        }
+                        else if(!buttons.get(j).getProcessList().isEmpty()) {
+                            panelCurrentlyBuilding = true;
+                            LuaJGlobal.addNewLuaJGlobal("buildingPanel" + i, LuaInteger.valueOf(j));
+                            LuaJGlobal.addNewLuaJGlobal("buildingPanelReady" + i, LuaInteger.valueOf(-1));
+
+                        }
+                    }
+                    if(panelCurrentlyBuilding == false) {
+                        LuaJGlobal.addNewLuaJGlobal("buildingPanel" + i, LuaInteger.valueOf(-1));
+                        LuaJGlobal.addNewLuaJGlobal("buildingPanelReady" + i, LuaInteger.valueOf(-1));
+
+                    }
+                }
+                return LuaJGlobal.getLuaJGlobal(globalVarName.tojstring());
             }
             return NIL;
         }
@@ -310,6 +344,71 @@ public class CallLua extends TwoArgFunction {
         {
             long gameTime = System.currentTimeMillis() - Map.startTime;
             return LuaValue.valueOf(gameTime);
+        }
+    }
+    public static class drawText extends SevenArgFunction {
+        public LuaValue call(LuaValue xCoordinate, LuaValue yCoordinate, LuaValue text, LuaValue NIL0, LuaValue NIL1, LuaValue NIL2, LuaValue NIL3) {
+            Launch.g.getEngine().getContainer().getGraphics().drawString(text.tojstring(), xCoordinate.toint(), yCoordinate.toint());
+            return NIL;
+        }
+    }
+
+    public static class addPriority extends SevenArgFunction {
+        public LuaValue call(LuaValue functionCall, LuaValue parameters, LuaValue priority, LuaValue NIL0, LuaValue NIL1, LuaValue NIL2, LuaValue NIL3) {
+            LuaJGlobal.AIpriorityQueue.add(new AIGamePriorities(functionCall, parameters, priority));
+            return NIL;
+        }
+    }
+
+    public static class removeTopPriority extends SevenArgFunction {
+        public LuaValue call(LuaValue functionCall, LuaValue parameters, LuaValue priority, LuaValue NIL0, LuaValue NIL1, LuaValue NIL2, LuaValue NIL3) {
+            LuaTable topPriority = new LuaTable();
+            System.out.println("java.removeTopPriority");
+            if(LuaJGlobal.AIpriorityQueue.size() > 0) {
+                System.out.println("XXX" + LuaJGlobal.AIpriorityQueue.peek());
+                topPriority.set(0, LuaJGlobal.AIpriorityQueue.peek().myFunction);
+                topPriority.set(1, LuaJGlobal.AIpriorityQueue.peek().parameters);
+                LuaJGlobal.AIpriorityQueue.poll();
+                return topPriority;
+            }
+            return NIL;
+        }
+    }
+
+    public static class getTopPriority extends SevenArgFunction {
+        public LuaValue call(LuaValue NIL0, LuaValue NIL1, LuaValue NIL2, LuaValue NIL3, LuaValue NIL4, LuaValue NIL5, LuaValue NIL6) {
+            LuaTable topPriority = new LuaTable();
+            if(LuaJGlobal.AIpriorityQueue.peek() != null) {
+                topPriority.set(0, LuaJGlobal.AIpriorityQueue.peek().myFunction);
+                topPriority.set(1, LuaJGlobal.AIpriorityQueue.peek().parameters);
+                return topPriority;
+            }
+            else {
+                return NIL;
+            }
+
+        }
+    }
+
+//    public static class getAllPriorities extends SevenArgFunction {
+//        public LuaValue call(LuaValue NIL0, LuaValue NIL1, LuaValue NIL2, LuaValue NIL3, LuaValue NIL4, LuaValue NIL5, LuaValue NIL6) {
+//            LuaTable allPriorities = new LuaTable();
+//            int i = 0;
+//            for(AIGamePriorities p : LuaJGlobal.AIpriorityQueue) {
+//                LuaTable topPriority = new LuaTable();
+//                topPriority.set(0, LuaJGlobal.AIpriorityQueue.peek().myFunction);
+//                topPriority.set(1, LuaJGlobal.AIpriorityQueue.peek().parameters);
+//                i++;
+//                allPriorities.set(i, topPriority);
+//            }
+//            return allPriorities;
+//        }
+//    }
+
+    public static class clearPriorities extends SevenArgFunction {
+        public LuaValue call(LuaValue functionCall, LuaValue yCoordinate, LuaValue text, LuaValue NIL0, LuaValue NIL1, LuaValue NIL2, LuaValue NIL3) {
+            LuaJGlobal.AIpriorityQueue.clear();
+            return NIL;
         }
     }
 }

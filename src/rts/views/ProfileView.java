@@ -165,6 +165,14 @@ public class ProfileView extends View
         {
            simpleTable.addRow(Configuration.getName1());
         }
+        if (!Configuration.getName2().equals("Player"))
+        {
+            simpleTable.addRow(Configuration.getName2());
+        }
+        if (!Configuration.getName3().equals("Player"))
+        {
+            simpleTable.addRow(Configuration.getName3());
+        }
         //Buttons
         deleteButton = new Button("Delete");
         deleteButton.setPosition(60,300);
@@ -238,14 +246,43 @@ public class ProfileView extends View
             @Override
             public void run()
             {
-                if(selectionModel.isSelected(0))
+               if(!Configuration.getName1().equals("Player") && Configuration.getName2().equals("Player") && Configuration.getName3().equals("Player"))
                 {
-
                     try {
                     game.getNetworkManager().createServer();
                     game.getNetworkManager().joinServer("localhost");
                     game.enterState(Game.CREATE_VIEW_ID, new FadeOutTransition(), new FadeInTransition());
                     } catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+                else if(!Configuration.getName1().equals("Player") && !Configuration.getName2().equals("PLayer") || !Configuration.getName3().equals("PLayer"))
+                {
+                    if (selectionModel.isSelected(0))
+                    try {
+                        game.getNetworkManager().createServer();
+                        game.getNetworkManager().joinServer("localhost");
+                        game.enterState(Game.CREATE_VIEW_ID, new FadeOutTransition(), new FadeInTransition());
+                    } catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    else if (selectionModel.isSelected(1))
+                        try {
+                                game.getNetworkManager().createServer();
+                                game.getNetworkManager().joinServer("localhost");
+                                game.enterState(Game.CREATE_VIEW_ID, new FadeOutTransition(), new FadeInTransition());
+                            } catch (IOException e)
+                        {
+                            e.printStackTrace();
+                    }
+                    else if (selectionModel.isSelected(2))
+                    try {
+                            game.getNetworkManager().createServer();
+                            game.getNetworkManager().joinServer("localhost");
+                            game.enterState(Game.CREATE_VIEW_ID, new FadeOutTransition(), new FadeInTransition());
+                        } catch (IOException e)
                     {
                         e.printStackTrace();
                     }

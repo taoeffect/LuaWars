@@ -64,7 +64,7 @@ public class ResourcesView extends View {
 		bar.setPosition(container.getWidth() / 2 - 160, container.getHeight() / 2 - 20);
 		root.add(bar);
 
-		container.setMouseGrabbed(true);
+		container.setMouseGrabbed(false);
 	}
 
 	@Override
