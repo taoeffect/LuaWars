@@ -76,7 +76,7 @@ public class CallLua extends TwoArgFunction {
         library.set("getLuaJGlobal", new getLuaJGlobal());
         library.set("placeBuilding", new placeBuilding());
         library.set("setUpBase", new setUpBase());
-        //library.set("selectUnitsAttack", new selectUnitsAttack());
+        library.set("selectUnitsAttack", new selectUnitsAttack());
         library.set("drawText", new drawText());
         library.set("addPriority", new addPriority());
         library.set("getTopPriority", new getTopPriority());
@@ -255,6 +255,12 @@ public class CallLua extends TwoArgFunction {
         }
     }
 
+    public static class selectUnitsAttack extends SevenArgFunction {
+        public LuaValue call(LuaValue tileX, LuaValue tileY, LuaValue NIL2, LuaValue NIL3, LuaValue NIL4, LuaValue NIL5, LuaValue NIL6) {
+            Launch.g.getEngine().getInput().moveOrAttackAction(tileX.toint() * Launch.g.getEngine().getTileW(), tileY.toint() * Launch.g.getEngine().getTileH());
+            return NIL;
+        }
+    }
     public static class moveOrSpecialAction extends TwoArgFunction {
         // the lua version takes in tile coordinates
         // however moveOrSpecialAction takes in x, y coordinates (i.e. pixel coordinates)
