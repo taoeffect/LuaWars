@@ -4,6 +4,8 @@ import java.awt.Point;
 import java.io.InputStream;
 import java.util.ArrayList;
 
+import org.luawars.LuaJScripting.CallLua;
+import org.luawars.LuaJScripting.LuaJGlobal;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -134,6 +136,9 @@ public class Map extends TiledMap implements TileBasedMap, Comparable<Map> {
 		}
 
 		if (engine.isNetwork()) {
+            CallLua.runScript("myScript.lua", null);
+            LuaJGlobal.initializeLuaJGlobal();
+
 			// Create own builder
 			Player player = engine.getPlayer();
 			Point p = spawns.get(player.getSpawn());

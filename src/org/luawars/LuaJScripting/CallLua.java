@@ -12,7 +12,6 @@ import org.luawars.Log;
 import rts.Launch;
 import rts.core.engine.ingamegui.GuiButton;
 import rts.core.engine.ingamegui.GuiPanel;
-import rts.core.engine.map.Map;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -76,12 +75,12 @@ public class CallLua extends TwoArgFunction {
         library.set("getLuaJGlobal", new getLuaJGlobal());
         library.set("placeBuilding", new placeBuilding());
         library.set("setUpBase", new setUpBase());
-        library.set("selectUnitsAttack", new selectUnitsAttack());
         library.set("drawText", new drawText());
         library.set("addPriority", new addPriority());
         library.set("getTopPriority", new getTopPriority());
         library.set("removeTopPriority", new removeTopPriority());
         library.set("clearPriorities", new clearPriorities());
+
 
         env.set("org.luawars.LuaJScripting.CallLua", library);
 
@@ -100,21 +99,22 @@ public class CallLua extends TwoArgFunction {
     public static LuaValue runScript(String fileNameWithPath) {
         return runScript(fileNameWithPath, "");
     }
-    /**
-     * General method to run a Lua script.
-     * Note: run script must be called before you can call callFunction.
-     * I'm not exactly sure why. I think it is because Lua puts all the functions' addresses on a table by
-     * calling runScript, and once the functions are on a table, calling a function will make Lua
-     * look at the table to see what address to go to
-     *
-     * @param scriptFileName - script to run
-     * @return
-     */
+        /**
+         * General method to run a Lua script.
+         * Note: run script must be called before you can call callFunction.
+         * I'm not exactly sure why. I think it is because Lua puts all the functions' addresses on a table by
+         * calling runScript, and once the functions are on a table, calling a function will make Lua
+         * look at the table to see what address to go to
+         *
+         * @param scriptFileName - script to run
+         * @return
+         */
     public static LuaValue runScript(String scriptFileName, String folderPath) {
         Log.trace("running script {}", scriptFileName);
         try {
             if(folderPath == null) {
-                folderPath = "resources/Lua Scripts/";
+                //folderPath = "resources/Lua Scripts/";
+                folderPath = "C:/Users/Trung/Documents/GitHub/LuaWars/resources/Lua Scripts/";
             }
 
             String tempScriptFileName = scriptFileName;
@@ -125,7 +125,7 @@ public class CallLua extends TwoArgFunction {
             // to see how to use lua parser look at this
             //https://github.com/headius/luaj/blob/master/README.html
             // scroll down to parser section
-            //System.out.println(folderPath + scriptFileName);
+            //System.out.println("Calling " + folderPath + scriptFileName);
             LuaParser parser = new LuaParser(new FileInputStream(folderPath + scriptFileName));
             Chunk chunk = parser.Chunk();
             return G.loadFile(folderPath + scriptFileName).call();
@@ -254,12 +254,6 @@ public class CallLua extends TwoArgFunction {
         }
     }
 
-    public static class selectUnitsAttack extends SevenArgFunction {
-        public LuaValue call(LuaValue tileX, LuaValue tileY, LuaValue NIL2, LuaValue NIL3, LuaValue NIL4, LuaValue NIL5, LuaValue NIL6) {
-            Launch.g.getEngine().getInput().moveOrAttackAction(tileX.toint() * Launch.g.getEngine().getTileW(), tileY.toint() * Launch.g.getEngine().getTileH());
-            return NIL;
-        }
-    }
     public static class moveOrSpecialAction extends TwoArgFunction {
         // the lua version takes in tile coordinates
         // however moveOrSpecialAction takes in x, y coordinates (i.e. pixel coordinates)
@@ -338,14 +332,6 @@ public class CallLua extends TwoArgFunction {
         }
     }
 
-    public static class clock extends ZeroArgFunction
-    {
-        public LuaValue call()
-        {
-            long gameTime = System.currentTimeMillis() - Map.startTime;
-            return LuaValue.valueOf(gameTime);
-        }
-    }
     public static class drawText extends SevenArgFunction {
         public LuaValue call(LuaValue xCoordinate, LuaValue yCoordinate, LuaValue text, LuaValue NIL0, LuaValue NIL1, LuaValue NIL2, LuaValue NIL3) {
             Launch.g.getEngine().getContainer().getGraphics().drawString(text.tojstring(), xCoordinate.toint(), yCoordinate.toint());

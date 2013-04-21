@@ -30,11 +30,11 @@ end
 -- @optional param : unitType - type of unit you want to select. if NIL, selects all types
 -- @optional param : numUnits - number of units. if nil, selects up to 1000 units (basically all units)
 -- @optional param : radius - get units within radius units away from (tileX, tileY) point
-function selectUnits(tileX, tileY, unitType, numUnits, radius, ...)
+function selectUnits(tileCoordinate, unitType, numUnits, radius, ...)
     radius = radius or 1000
     numUnits = numUnits or 1000
-    if(tileX and tileY) then
-        CallLua.selectUnits(tileX, tileY, radius, numUnits, unitType)
+    if(tileCoordinate) then
+        CallLua.selectUnits(tileCoordinate.x, tileCoordinate.y, radius, numUnits, unitType)
         removeTopPriority()
         return true
     end
@@ -51,18 +51,20 @@ end
 -- or does a special action if you call moveOrSpecialAction on the tile the unit is at
 -- @param: tileX - x tile coordinate where you want to move or do the special action
 -- @param: tileY - y tile coordinate where you want to move or do the special action
-function moveOrSpecialAction(tileX, tileY, ...)
-    CallLua.moveOrSpecialAction(tileX, tileY)
-    removeTopPriority()
+function moveOrSpecialAction(tileCoordinate, ...)
+    if(tileCoordinate) then
+        CallLua.moveOrSpecialAction(tileCoordinate.x, tileCoordinate.y)
+        removeTopPriority()
+    end
     return true
 end
 
 -- when a building is ready, you can place a building with this function
 -- @param: tileX - x tile coordinate where you want to place the building
 -- @param: tileY - y tile coordinate where you want to place the building
-function placeBuilding(tileX, tileY, ...)
-    if(tileX and tileY and (getGlobal('buildingPanelReady0') > -1 or getGlobal('buildingPanelReady2') > -1)) then
-        CallLua.placeBuilding(tileX, tileY)
+function placeBuilding(tileCoordinate, ...)
+    if(tileCoordinate and (getGlobal('buildingPanelReady0') > -1 or getGlobal('buildingPanelReady2') > -1)) then
+        CallLua.placeBuilding(tileCoordinate.x, tileCoordinate.y)
         removeTopPriority()
         return true
     -- if you can't place the building at tileX, tileY, then just remove the top priority
@@ -91,9 +93,11 @@ function getGlobal(globalVarName, ...)
     end
 end
 
-function drawText(xCoordinate, yCoordinate, text, ...)
-    if(xCoordinate and yCoordinate and text) then
-        CallLua.drawText(xCoordinate, yCoordinate, text)
+-- Allows the user to draw text on the screen
+-- @param :
+function drawText(screenCoordinate, text, ...)
+    if(screenCoordinate and text) then
+        CallLua.drawText(screenCoordinate.x, screenCoordinate.y, text)
         return true
     end
 end
