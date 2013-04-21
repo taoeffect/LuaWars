@@ -8,6 +8,8 @@ import java.util.PriorityQueue;
 import java.util.Iterator;
 import java.util.Collections;
 
+import org.luawars.LuaJScripting.CallLua;
+import org.luawars.LuaJScripting.LuaJGlobal;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Font;
 import org.newdawn.slick.GameContainer;
@@ -92,6 +94,7 @@ public class Engine extends View {
     private boolean isNetwork;
 
     private boolean escapeMenu; // we don't want the screen to scroll when the escape menu is up
+    CallLua callLua;
 
     // To count the ents
     private int[] entsCount;
@@ -111,6 +114,8 @@ public class Engine extends View {
         exitTimer = new Timer(4000);
         exitTimer.setTimeComplete();
         effectManager = new EffectManager(this);
+
+        callLua = new CallLua(gui.getMenuGui(), input);
 
         escapeMenu = false;
     }
@@ -443,6 +448,7 @@ public class Engine extends View {
             layers.get(i).clear();
         }
         gui.clear();
+        callLua.reset(getPlayer());
 
         // add the new rounds
         this.rounds.addAll(rounds);

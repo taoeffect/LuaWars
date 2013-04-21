@@ -1,8 +1,8 @@
 -- this file updates every frame
-require 'myScript'
+
 if(getTopPriority()) then
-    priorityFunction = getTopPriority()[0]
-    priorityParameters = getTopPriority()[1]
+    priorityFunction = getTopPriority()[1]
+    priorityParameters = getTopPriority()[2]
     --print(priorityFunction)
     --print(table.unpack(priorityParameters))
     priorityFunction(table.unpack(priorityParameters))
