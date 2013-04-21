@@ -297,6 +297,10 @@ public class Configuration {
 		return configurationFile.getProperty("debug").equals("true");
 	}
 
+    public static boolean enableMusic() {
+        return configurationFile.getProperty("enableMusic").equalsIgnoreCase("true");
+    }
+
 	/**
 	 * Set the on/off debug.
 	 * 
