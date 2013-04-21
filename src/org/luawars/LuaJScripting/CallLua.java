@@ -397,4 +397,45 @@ public class CallLua extends TwoArgFunction {
             return NIL;
         }
     }
+
+    public static class repairBuilding extends TwoArgFunction
+    {
+        public LuaValue call(LuaValue tileX, LuaValue tileY)
+        {
+            Launch.g.getEngine().getInput().repairBuilding(tileX.toint()*Launch.g.getEngine().getTileW(), tileY.toint()*Launch.g.getEngine().getTileH());
+            return NIL;
+        }
+    }
+
+    public static class sellBuilding extends TwoArgFunction
+    {
+        public LuaValue call(LuaValue tileX, LuaValue tileY)
+        {
+            Launch.g.getEngine().getInput().sellBuilding(tileX.toint()*Launch.g.getEngine().getTileW(), tileY.toint()*Launch.g.getEngine().getTileH());
+            return NIL;
+        }
+    }
+
+    public static class cancelProcess extends TwoArgFunction {
+        public LuaValue call(LuaValue panelId, LuaValue buttonNum) {
+            Log.trace("calling cancel function with panelId {}, buttonNum {}", panelId, buttonNum);
+
+            ArrayList<GuiPanel> panels = Launch.g.getEngine().getGui().getMenuGui().getPanels();
+            if(panelId.toint() >= 0 && panelId.toint() < panels.size()){
+
+                ArrayList<GuiButton> buttons = panels.get(panelId.toint()).getButtons();
+                if(buttonNum.toint() >= 0 && buttonNum.toint() < buttons.size()) {
+                    Log.trace("creating unit or building {}", buttons.get(buttonNum.toint()));
+                    buttons.get(buttonNum.toint()).checkCancelProcess();
+                }
+                else {
+                    Log.error("Attempted to use button outside of button size range.");
+                }
+            }
+            else {
+                Log.error("Attempted to use panel outside of panel size range.");
+            }
+            return NIL;
+        }
+    }
 }

@@ -118,31 +118,41 @@ public class GuiButton {
         this.y = y;
     }
 
-    public void checkCancelProcess() {
-        if (engine.isMouseRightPressed() && isMouseOver()) {
-            if (enable) {
-                if (!processList.isEmpty()) {
-                    if (processList.get(0).pause || processList.get(0).ready) {
-                        if (processList.size() > 1) {
-                            processList.get(1).advancement = processList.get(0).advancement;
-                            if (processList.get(0).pause)
-                                processList.get(1).pause = true;
-                        } else {
-                            engine.getPlayer().addMoney(processList.get(0).advancement);
-                        }
-                        processList.remove(0);
-                        building = null;
-                    } else {
-                        if (!processList.get(0).pause) {
-                            processList.get(0).pause = true;
-                        } else {
-                            processList.remove(0);
-                            building = null;
-                        }
+    public void checkCancelProcess()
+    {
+
+    if(enable)
+    {
+        if (!processList.isEmpty())
+        {
+            if (processList.get(0).pause || processList.get(0).ready)
+            {
+                if (processList.size() > 1)
+                {
+                processList.get(1).advancement = processList.get(0).advancement;
+                if (processList.get(0).pause)
+                     processList.get(1).pause = true;
                     }
+                else
+                {
+                    engine.getPlayer().addMoney(processList.get(0).advancement);
+                }
+                processList.remove(0);
+                building = null;
+            }
+            else
+            {
+                if (!processList.get(0).pause) {
+                    processList.get(0).pause = true;
+                }
+                else
+                {
+                    processList.remove(0);
+                    building = null;
                 }
             }
         }
+    }
     }
 
     public void blink(int delta) {

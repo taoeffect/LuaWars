@@ -123,14 +123,14 @@ public class PlayerInput {
         }
     }
 
-    private void repairBuilding(int x, int y) {
+    public void repairBuilding(int x, int y) {
         ActiveEntity ae = engine.getEntityAt(null, x, y);
         if (ae != null && ae instanceof Building && engine.isPlayerEntity(ae.getPlayerId())) {
             ((Building) ae).repair();
         }
     }
 
-    private void sellBuilding(int x, int y) {
+    public void sellBuilding(int x, int y) {
         ActiveEntity ae = engine.getEntityAt(null, x, y);
         if (ae != null && ae instanceof Building && engine.isPlayerEntity(ae.getPlayerId())) {
             ((Building) ae).sell();
