@@ -620,7 +620,62 @@ public class Engine extends View {
      * @param tileX - point to select close to
      * @param tileY
      */
+    /* To determine all enemies in the area */
+    public ArrayList<ActiveEntity> selectAllEnemies(int tileX,int tileY)
+    {
+        ArrayList<ActiveEntity> allEnemies =
+                new ArrayList<ActiveEntity>();
+        for (int i = 0; i < layers.size(); i++) {
+            for(int j = 0; j < layers.get(i).getArray().size(); j++){
+                if(layers.get(i).getArray().get(j) instanceof ActiveEntity){
+                    ActiveEntity currentUnit = (ActiveEntity) layers.get(i).getArray().get(j);
+                    if(currentUnit.getPlayerId() != this.getPlayer().getId()) {
+                        allEnemies.add(currentUnit);
+                    }
+                }
+            }
+        }
+        return allEnemies;
+    }
+
+    /* Determine's distance of unit A and B */
+    public boolean DistanceOfUnit(ActiveEntity unitA, ActiveEntity unitB)
+    {
+        float currentTileX1 = unitA.getX()/getTileW();
+        float currentTileY1 = unitA.getX()/getTileW();
+        float currentTileX2 = unitB.getX()/getTileW();
+        float currentTileY2 = unitB.getX()/getTileW();
+        // get units less than radius number of tiles away
+        double distanceFromPoint = Math.pow(currentTileX1 - currentTileX2, 2) + Math.pow(currentTileY1 - currentTileY2, 2);
+
+        return Math.pow(EData.VIEW[unitA.getType()],2) < distanceFromPoint;
+    }
+
+    /* Selects all units */
+    public ArrayList<ActiveEntity> selectAllUnits(int x, int y)
+    {
+        ArrayList<ActiveEntity> allUnits = new ArrayList<ActiveEntity>();
+
+        for(int i=0;i< layers.size(); i++)
+        {
+            for(int j=0; i<layers.get(i).getArray().size(); j++)
+            {
+                if (layers.get(i).getArray().get(j) instanceof ActiveEntity)
+                {
+                    ActiveEntity currentUnit = (ActiveEntity) layers.get(i).getArray().get(j);
+                    if (currentUnit.getPlayerId() == this.getPlayer().getId())
+                    {
+                        allUnits.add(currentUnit);
+                    }
+                }
+            }
+        }
+        return allUnits;
+    }
+
+    /* Trung's Function */
     public ArrayList<ActiveEntity> selectClosestEntities(int tileX, int tileY, float radius, int numUnits, String unitType){
+        // this part finds all of the player's units on the map and adds them into allEnts
         PriorityQueue<ActiveEntity> allEnts =
                 new PriorityQueue<ActiveEntity>(10, new ActiveEntityComparator(new Point(tileX, tileY)));
         int wantedUnitType = unitType == null ? -1 : getTypeFromName(unitType);
@@ -634,6 +689,8 @@ public class Engine extends View {
                 }
             }
         }
+
+        // now that we have all the entities, find the entities that are closest to the radius and put them in selectedUnits
         ArrayList<ActiveEntity> selectedUnits = new ArrayList<ActiveEntity>();
         Iterator<ActiveEntity> iter = allEnts.iterator();
         for(int i = 0; i < numUnits; i++){

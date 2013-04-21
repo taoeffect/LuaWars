@@ -107,6 +107,14 @@ function drawText(screenCoordinate, text, ...)
     end
 end
 
+function setUpBase()
+    CallLua.setUpBase()
+end
+
+function selectUnitsAttack(tileX, tileY)
+    CallLua.setUpBase(tileX, tileY)
+end
+
 -- PRIORITY FUNCTIONS
 function addPriority(functionName, parameterTable, priority)
     return CallLua.addPriority(functionName, parameterTable, priority)

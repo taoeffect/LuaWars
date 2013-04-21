@@ -17,6 +17,7 @@ import org.newdawn.slick.state.GameState;
 import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.util.InputAdapter;
 import rts.core.engine.Engine;
+import rts.core.engine.GameMusic;
 import rts.core.network.NetworkManager;
 import rts.utils.Configuration;
 import rts.utils.ResourceManager;
@@ -207,8 +208,9 @@ Exception in thread "AWT-EventQueue-0" java.lang.IllegalStateException: Mouse mu
 		container.setVSync(Configuration.isVSynch());
 		container.setMusicVolume(Configuration.getMusicVolume());
 		container.setSoundVolume(Configuration.getSoundVolume());
-		container.setShowFPS((Configuration.isDebug()) ? true : false);
-		container.setVerbose((Configuration.isDebug()) ? true : false);
+		container.setShowFPS(Configuration.isDebug());
+        container.setVerbose(Configuration.isDebug());
+        GameMusic.ENABLE_MUSIC = Configuration.enableMusic();
 	}
 
 	/**
@@ -247,7 +249,7 @@ Exception in thread "AWT-EventQueue-0" java.lang.IllegalStateException: Mouse mu
 			lwjglRenderer = new LWJGLRenderer();
 			lwjglRenderer.setUseSWMouseCursors(true);
 			theme = ThemeManager.createThemeManager(Thread.currentThread().getContextClassLoader().getResource(THEME_PATH), lwjglRenderer);
-			gui = new GUI(lwjglRenderer);
+            gui = new GUI(lwjglRenderer);
 			gui.applyTheme(theme);
 		} catch (LWJGLException e) {
 			e.printStackTrace();

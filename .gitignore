@@ -4,6 +4,8 @@ lib/resources.jar
 out/
 
 *.class
+*~
+*#
 
 # Package Files #
 *.war
