@@ -1,3 +1,4 @@
-print("running newScript2.lua");
+print("runningX XXX newScript2.lua");
 require "myScript"
-setUpBase();
+
+setUpBase()

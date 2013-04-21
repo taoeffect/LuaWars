@@ -1,150 +1,150 @@
 package rts.core.engine;
 
 /**
- * 
+ *
  * This class represent a simple Player.
- * 
+ *
  * @author Vincent PIRAULT
- * 
+ *
  */
 public class Player {
 
-	private static final int START_MAX_MONEY = 10000;
+    private static final int START_MAX_MONEY = 10000;
 
-	public int packetId;
-	
-	private String pseudo;
-	private int spawn;
-	private int color;
-	private int maxMoney;
-	private int money;
-	private int id;
-	private int teamId;
-	private int tecLevel;
-	private boolean isPlayer;
-	private boolean isAI;
+    public int packetId;
 
-	public Player() {
-		maxMoney = START_MAX_MONEY;
-	}
+    private String pseudo;
+    private int spawn;
+    private int color;
+    private int maxMoney;
+    private int money;
+    private int id;
+    private int teamId;
+    private int tecLevel;
+    private boolean isPlayer;
+    private boolean isAI;
 
-	public void update(Player player) {
-		this.pseudo = player.pseudo;
-		this.color = player.color;
-		this.maxMoney = player.maxMoney;
-		this.money = player.money;
-		this.teamId = player.teamId;
-		this.tecLevel = player.tecLevel;
-	}
+    public Player() {
+        maxMoney = START_MAX_MONEY;
+    }
 
-	public boolean addMoney(int money) {
-		if (this.money + money <= maxMoney) {
-			this.money += money;
-			return true;
-		} else {
-			if (this.money < maxMoney) {
-				this.money = maxMoney;
-			}
-		}
-		return false;
-	}
+    public void update(Player player) {
+        this.pseudo = player.pseudo;
+        this.color = player.color;
+        this.maxMoney = player.maxMoney;
+        this.money = player.money;
+        this.teamId = player.teamId;
+        this.tecLevel = player.tecLevel;
+    }
 
-	public boolean removeMoney(int money) {
-		if (this.money - money >= 0) {
-			this.money -= money;
-			return true;
-		} else {
-			return false;
-		}
-	}
+    public boolean addMoney(int money) {
+        if (this.money + money <= maxMoney) {
+            this.money += money;
+            return true;
+        } else {
+            if (this.money < maxMoney) {
+                this.money = maxMoney;
+            }
+        }
+        return false;
+    }
 
-	public void increaseMaxMoney() {
-		maxMoney += 2500;
-	}
+    public boolean removeMoney(int money) {
+        if (this.money - money >= 0) {
+            this.money -= money;
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-	public void decreaseMaxMoney() {
-		maxMoney -= 2500;
-		if (money > maxMoney) {
-			money = maxMoney;
-		}
-	}
+    public void increaseMaxMoney() {
+        maxMoney += 2500;
+    }
 
-	// Getters and setter
+    public void decreaseMaxMoney() {
+        maxMoney -= 2500;
+        if (money > maxMoney) {
+            money = maxMoney;
+        }
+    }
 
-	public int getColor() {
-		return color;
-	}
+    // Getters and setter
 
-	public int getSpawn() {
-		return spawn;
-	}
+    public int getColor() {
+        return color;
+    }
 
-	public void setSpawn(int spawn) {
-		this.spawn = spawn;
-	}
+    public int getSpawn() {
+        return spawn;
+    }
 
-	public void setColor(int color) {
-		this.color = color;
-	}
+    public void setSpawn(int spawn) {
+        this.spawn = spawn;
+    }
 
-	public String getPseudo() {
-		return pseudo;
-	}
+    public void setColor(int color) {
+        this.color = color;
+    }
 
-	public void setPseudo(String pseudo) {
-		this.pseudo = pseudo;
-	}
+    public String getPseudo() {
+        return pseudo;
+    }
 
-	public int getMoney() {
-		return money;
-	}
+    public void setPseudo(String pseudo) {
+        this.pseudo = pseudo;
+    }
 
-	public void setMoney(int money) {
-		this.money = money;
-	}
+    public int getMoney() {
+        return money;
+    }
 
-	public int getMaxMoney() {
-		return maxMoney;
-	}
+    public void setMoney(int money) {
+        this.money = money;
+    }
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    public int getMaxMoney() {
+        return maxMoney;
+    }
 
-	public int getId() {
-		return id;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public int getTeamId() {
-		return teamId;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public void setTeamId(int teamId) {
-		this.teamId = teamId;
-	}
+    public int getTeamId() {
+        return teamId;
+    }
 
-	public boolean isPlayer() {
-		return isPlayer;
-	}
+    public void setTeamId(int teamId) {
+        this.teamId = teamId;
+    }
 
-	public boolean isAI() {
-		return isAI;
-	}
+    public boolean isPlayer() {
+        return isPlayer;
+    }
 
-	public void setTecLevel(int tecLevel) {
-		this.tecLevel = tecLevel;
-	}
+    public boolean isAI() {
+        return isAI;
+    }
 
-	public int getTecLevel() {
-		return tecLevel;
-	}
+    public void setTecLevel(int tecLevel) {
+        this.tecLevel = tecLevel;
+    }
 
-	public void setPlayer(boolean isPlayer) {
-		this.isPlayer = isPlayer;
-	}
+    public int getTecLevel() {
+        return tecLevel;
+    }
 
-	public void setAI(boolean isAI) {
-		this.isAI = isAI;
-	}
+    public void setPlayer(boolean isPlayer) {
+        this.isPlayer = isPlayer;
+    }
+
+    public void setAI(boolean isAI) {
+        this.isAI = isAI;
+    }
 
 }
