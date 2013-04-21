@@ -102,7 +102,6 @@ function drawText(screenCoordinate, text, ...)
     end
 end
 
-<<<<<<< HEAD
 function setUpBase()
     CallLua.setUpBase()
 end
