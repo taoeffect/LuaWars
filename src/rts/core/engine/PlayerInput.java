@@ -79,16 +79,18 @@ public class PlayerInput {
     }
 
     // here might allow us to select items or move them
+    // CURRENTLY IN LUA WARS, NO WAY TO SELL OR REPAIR BUILDINGS
+    // IF YOU WANT TO ADD MOUSE PRESSES BACK UNCOMMENT OUT THESE
     private void updateMouse(GameContainer container, boolean onGui, int mx, int my, int decX, int decY) {
         if (engine.isMouseRightPressed() && !onGui) {
             if (engine.getGui().isSellMod()) {
-                sellBuilding(mx + decX, my + decY);
+                //sellBuilding(mx + decX, my + decY);
                 // note i changed the structure of these if/else statements
                 // to be less confusing
             } else if (engine.getGui().isRepairMod()) {
-                repairBuilding(mx + decX, my + decY);
+                //repairBuilding(mx + decX, my + decY);
             } else {
-                moveOrSpecialAction(mx + decX, my + decY);
+                //moveOrSpecialAction(mx + decX, my + decY);
             }
         } else {
             selectAction(container, onGui, mx, my, decX, decY);

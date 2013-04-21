@@ -91,6 +91,8 @@ public class Engine extends View {
     private boolean mouseLeftPressed;
     private boolean isNetwork;
 
+    private boolean escapeMenu; // we don't want the screen to scroll when the escape menu is up
+
     // To count the ents
     private int[] entsCount;
 
@@ -109,6 +111,8 @@ public class Engine extends View {
         exitTimer = new Timer(4000);
         exitTimer.setTimeComplete();
         effectManager = new EffectManager(this);
+
+        escapeMenu = false;
     }
 
     @Override
@@ -242,6 +246,7 @@ public class Engine extends View {
     }
 
     @Override
+    // THIS OPENS UP THE ESCAPE BUTTON
     public void keyPressed(int key, char c) {
         super.keyPressed(key, c);
 
@@ -249,6 +254,7 @@ public class Engine extends View {
             switch (key) {
                 case Input.KEY_ESCAPE:
                     igmWidget.setVisible(!igmWidget.isVisible());
+                    escapeMenu = !escapeMenu;
                     break;
                 default:
                     gui.keyPressed(key, c);
@@ -336,7 +342,7 @@ public class Engine extends View {
         mouseRightPressed = container.getInput().isMousePressed(Input.MOUSE_RIGHT_BUTTON);
 
         // UPDATE SCROLL
-        if (!input.isPressedLeft() && !container.getInput().isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && getMap().isNeededScroll()) {
+        if (!escapeMenu && !input.isPressedLeft() && !container.getInput().isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && getMap().isNeededScroll()) {
             float s = (container.getInput().isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON)) ? mouseScrollSpeed * delta * 2 : mouseScrollSpeed * delta;
 
             xScrollDecal += (mx < LIMIT_BEFORE_SCROLL && xScrollDecal + s < 0) ? s : 0;

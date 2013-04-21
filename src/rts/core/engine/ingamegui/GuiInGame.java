@@ -52,8 +52,8 @@ public class GuiInGame {
         this.patch = ResourceManager.getImage("ihmpatch");
         this.menuGui.init();
         // TRUNG NGUYEN
-        CallLua.runScript("myScript.lua", null);
-        LuaJGlobal.initializeLuaJGlobal();
+        //CallLua.runScript("myScript.lua", null);
+        //LuaJGlobal.initializeLuaJGlobal();
     }
 
     // NOTE: THERE'S A WEIRD BUG WHERE IF YOU TYPE IN AN UPPERCASE LETTER IT WILL PUT A SPACE BEFORE THE UPPERCASE LETTER
@@ -263,7 +263,7 @@ public class GuiInGame {
     }
 
     public boolean isMouseOnGui(GameContainer container, int mx, int my) {
-        onGui = (visible && mx > container.getWidth() - width && my < container.getHeight());
+        onGui = (visible && mx > container.getWidth() - width && my < container.getHeight());//
         return onGui;
     }
 
