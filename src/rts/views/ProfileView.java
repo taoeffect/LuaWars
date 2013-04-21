@@ -24,6 +24,7 @@ import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.state.transition.FadeInTransition;
 import org.newdawn.slick.state.transition.FadeOutTransition;
 import rts.core.Game;
+import rts.utils.Configuration;
 import rts.utils.ResourceManager;
 import de.matthiasmann.twl.textarea.HTMLTextAreaModel;
 
@@ -132,14 +133,26 @@ public class ProfileView extends View
         textField.setPosition(10,25);
         textField.setSize(175, 40);
         textField.setVisible(false);
+
         textField.addCallback(new EditField.Callback() {
             public void callback(int key) {
                 if (key == Keyboard.KEY_RETURN) {
                     if (!textField.getText().trim().isEmpty())
                     {
-                        simpleTable.addRow(textField.getText());
-                        selectionModel.setSelection(0, 1);
-                        createpanel.setVisible(false);
+                        try
+                        {
+                            simpleTable.addRow(textField.getText());
+                            Configuration.setName1(textField.getText());
+                            selectionModel.setSelection(0, 1);
+                            createpanel.setVisible(false);
+                            textField.setVisible(false);
+                            Configuration.saveNewConfig();
+                            game.applyCurrentConfiguration();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (SlickException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
@@ -148,6 +161,10 @@ public class ProfileView extends View
         createpanel.add(textField);
         root.add(createpanel);
 
+        if (!Configuration.getName1().equals("Player"))
+        {
+           simpleTable.addRow(Configuration.getName1());
+        }
         //Buttons
         deleteButton = new Button("Delete");
         deleteButton.setPosition(60,300);
@@ -157,9 +174,33 @@ public class ProfileView extends View
             @Override
             public void run()
             {
-
+                try
+                {
+                    if(selectionModel.isSelected(0))
+                    {
+                         Configuration.setName1("Player");
+                         Configuration.setProfile1("Default");
+                         simpleTable.deleteRow(0);
+                    }
+                    else if(selectionModel.isSelected(1))
+                    {
+                         simpleTable.getCell(0,1);
+                            simpleTable.deleteRow(1);
+                    }
+                    else if(selectionModel.isSelected(0))
+                    {
+                        simpleTable.getCell(0,2);
+                        simpleTable.deleteRow(2);
+                    }
+                    Configuration.saveNewConfig();
+                    game.applyCurrentConfiguration();
+                    } catch (IOException e) {
+					e.printStackTrace();
+				    } catch (SlickException e) {
+					e.printStackTrace();
+				    }
             }
-        });
+      });
         root.add(deleteButton);
 
         createButton = new Button("Create");
@@ -170,8 +211,21 @@ public class ProfileView extends View
           @Override
           public void run()
           {
-            createpanel.setVisible(true);
-            textField.setVisible(true);
+              //try
+              //{
+                //createpanel.setVisible(true);
+                //simpleTable.addRow(textField.getText());
+                //Configuration.setName1(textField.getText());
+                //selectionModel.setSelection(0, 1);
+                //Configuration.saveNewConfig();
+                //game.applyCurrentConfiguration();
+                createpanel.setVisible(true);
+                textField.setVisible(true);
+              //} catch (IOException e) {
+               //   e.printStackTrace();
+              //} catch (SlickException e) {
+               //   e.printStackTrace();
+              //}
           }
         });
         root.add(createButton);
@@ -187,14 +241,14 @@ public class ProfileView extends View
                 if(selectionModel.isSelected(0))
                 {
 
-                try {
-                game.getNetworkManager().createServer();
-                game.getNetworkManager().joinServer("localhost");
-                game.enterState(Game.CREATE_VIEW_ID, new FadeOutTransition(), new FadeInTransition());
-                } catch (IOException e)
-                {
-                    e.printStackTrace();
-                }
+                    try {
+                    game.getNetworkManager().createServer();
+                    game.getNetworkManager().joinServer("localhost");
+                    game.enterState(Game.CREATE_VIEW_ID, new FadeOutTransition(), new FadeInTransition());
+                    } catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
             }
         });

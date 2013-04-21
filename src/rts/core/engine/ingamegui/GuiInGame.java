@@ -66,7 +66,7 @@ public class GuiInGame {
                         addMessage(engine.getNetworkManager().sendMessage(message));
                     }
                     speakMod = false;
-                    if(message.contains("call ")) {
+                    if(message.startsWith("call ")) {
                         String fileName = message.substring(5, message.length());
                         Log.trace("attempting to call script: " + fileName + ".lua");
                         CallLua.runScript(fileName, null);

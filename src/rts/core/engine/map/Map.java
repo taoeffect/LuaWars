@@ -58,6 +58,7 @@ public class Map extends TiledMap implements TileBasedMap, Comparable<Map> {
 	private Image background;
 	private String name;
 	private ArrayList<ActiveEntity> rendererEntities;
+    public static long startTime;
 
 	// FOW
 
@@ -117,6 +118,7 @@ public class Map extends TiledMap implements TileBasedMap, Comparable<Map> {
 	}
 
 	public void init(Engine engine) {
+        startTime = System.currentTimeMillis();
 		// Need scroll ?
 		needScroll = (getWidthInPixel() > engine.getContainer().getWidth() || getHeightInPixel() > engine.getContainer().getHeight());
 
