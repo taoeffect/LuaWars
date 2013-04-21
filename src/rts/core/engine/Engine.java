@@ -611,8 +611,8 @@ public class Engine extends View {
     /* To determine all enemies in the area */
     public ArrayList<ActiveEntity> selectAllEnemies(int tileX,int tileY)
     {
-        ArrayList<ActiveEntity> allEnemies =
-                new ArrayList<ActiveEntity>();
+        ArrayList<ActiveEntity> allEnemies = new ArrayList<ActiveEntity>();
+
         for (int i = 0; i < layers.size(); i++) {
             for(int j = 0; j < layers.get(i).getArray().size(); j++){
                 if(layers.get(i).getArray().get(j) instanceof ActiveEntity){
@@ -627,7 +627,7 @@ public class Engine extends View {
     }
 
     /* Determine's distance of unit A and B */
-    public boolean DistanceOfUnit(ActiveEntity unitA, ActiveEntity unitB)
+    public boolean distanceOfUnits(ActiveEntity unitA, ActiveEntity unitB)
     {
         float currentTileX1 = unitA.getX()/getTileW();
         float currentTileY1 = unitA.getX()/getTileW();

@@ -85,15 +85,22 @@ public class PlayerInput {
         ArrayList<ActiveEntity> selectedAllUnits = engine.selectAllUnits(x,y);
         ArrayList<ActiveEntity> selectedAllEnemies = engine.selectAllEnemies(x,y);
         moveOrSpecialAction(x, y);
-        for(ActiveEntity ae1 : selectedAllUnits)
+        if (selectedAllUnits != null && selectedAllEnemies != null && !(engine.getMap().isEnableFow() && engine.getMap().fogOn(x / engine.getTileW(), y / engine.getTileH())))
         {
-            for(ActiveEntity ae2 : selectedAllEnemies)
+            for(ActiveEntity ae1 : selectedAllUnits)
             {
-                if(engine.DistanceOfUnit(ae1,ae2))
+                for(ActiveEntity ae2 : selectedAllEnemies)
                 {
-                    ae1.target((ActiveEntity) ae2, (int)ae2.getX(), (int)ae2.getY());
+                    if(engine.distanceOfUnits(ae1,ae2))
+                    {
+                        ae1.target((ActiveEntity) ae2, (int)ae2.getX(), (int)ae2.getY());
+                    }
                 }
             }
+        }
+        else
+        {
+            moveOrSpecialAction(x,y);
         }
 
     }
