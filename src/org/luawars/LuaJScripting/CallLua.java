@@ -85,7 +85,7 @@ public class CallLua {
 	}
 
     private static CallLua me() {
-        Log.debug(Log.me() + " fetching: " + G.get("cuid").toint());
+//        Log.debug(Log.me() + " fetching: " + G.get("cuid").toint());
         return intToCallLua.get(G.get("cuid").toint());
     }
 
@@ -272,32 +272,49 @@ public class CallLua {
         Launch.g.getEngine().getContainer().getGraphics().drawString(text, xCoordinate, yCoordinate);
 	}
 
-	public static void addPriority(LuaValue functionCall, LuaValue parameters, int priority) {
-        me().global.AIpriorityQueue.add(new AIGamePriorities(functionCall, parameters, priority));
+	public static void addPriority(LuaValue functionCall, LuaValue parameters, int priority, int index) {
+        me().global.AIpriorityQueue.add(new AIGamePriorities(functionCall, parameters, priority, index));
 	}
 
-	public static LuaValue removeTopPriority() {
-        LuaTable topPriority = null;
+//	public static LuaValue removeTopPriority() {
+//        int topPriority = null;
+//        if(me().global.AIpriorityQueue.size() > 0) {
+//            topPriority = new LuaTable();
+//            topPriority.set(1, me().global.AIpriorityQueue.peek().myFunction);
+//            topPriority.set(2, me().global.AIpriorityQueue.peek().parameters);
+//            me().global.AIpriorityQueue.poll();
+//        }
+//        return topPriority;
+//	}
+
+//	public static LuaTable getTopPriority() {
+//        LuaTable topPriority = null;
+//        if(me().global.AIpriorityQueue.peek() != null) {
+//            topPriority = new LuaTable();
+//            Log.debug("getTopPriority: " + me().global.AIpriorityQueue.peek());
+//            topPriority.set(1, me().global.AIpriorityQueue.peek().myFunction);
+//            topPriority.set(2, me().global.AIpriorityQueue.peek().parameters);
+//        }
+//        return topPriority;
+//	}
+
+    public static int removeTopPriority() {
+        int topPriority = 0;
         if(me().global.AIpriorityQueue.size() > 0) {
-            topPriority = new LuaTable();
-            topPriority.set(1, me().global.AIpriorityQueue.peek().myFunction);
-            topPriority.set(2, me().global.AIpriorityQueue.peek().parameters);
+            topPriority = me().global.AIpriorityQueue.peek().index;
             me().global.AIpriorityQueue.poll();
         }
         return topPriority;
-	}
+    }
 
-	public static LuaValue getTopPriority() {
-        LuaTable topPriority = null;
-        if(me().global.AIpriorityQueue.peek() != null) {
-            topPriority = new LuaTable();
-            topPriority.set(1, me().global.AIpriorityQueue.peek().myFunction);
-            topPriority.set(2, me().global.AIpriorityQueue.peek().parameters);
-        }
-        return topPriority;
-	}
 
-	public static void clearPriorities() {
+    public static int getTopPriority() {
+        AIGamePriorities p = me().global.AIpriorityQueue.peek();
+        return p == null ? 0 : p.index;
+    }
+
+
+    public static void clearPriorities() {
         me().global.AIpriorityQueue.clear();
 	}
 }

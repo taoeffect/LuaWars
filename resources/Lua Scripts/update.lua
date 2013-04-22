@@ -5,8 +5,10 @@ local tp = getTopPriority()
 if (tp) then
     priorityFunction = tp[1]
     priorityParameters = tp[2]
-    print(priorityParameters)
-    print(table.unpack(priorityParameters))
+--    print('tp: ' .. tp)
+--    print('priorityFunction: ' .. priorityFunction)
+--    print('priorityParams: ' .. priorityParameters)
+--    print(table.unpack(priorityParameters))
     priorityFunction(table.unpack(priorityParameters))
     --print('has top priority')
     --removeTopPriority()

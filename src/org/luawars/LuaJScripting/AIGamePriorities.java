@@ -1,6 +1,7 @@
 package org.luawars.LuaJScripting;
 
 import org.luaj.vm2.LuaValue;
+import org.luawars.Log;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,11 +14,14 @@ public class AIGamePriorities implements Comparable<AIGamePriorities> {
     public LuaValue myFunction;
     public LuaValue parameters;
     public int priority;
+    public int index;
 
-    public AIGamePriorities(LuaValue myFunction, LuaValue parameters, int priority) {
+    public AIGamePriorities(LuaValue myFunction, LuaValue parameters, int priority, int index) {
         this.myFunction = myFunction;
         this.parameters = parameters;
         this.priority = priority;
+        this.index = index;
+        Log.debug("Priority: " + myFunction + " params: " + parameters + " prio: " + priority + " index: " + index);
     }
 
     @Override

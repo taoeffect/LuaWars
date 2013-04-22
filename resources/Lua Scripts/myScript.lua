@@ -7,6 +7,10 @@ print("running myScript");
 CallLua = luajava.bindClass('org.luawars.LuaJScripting.CallLua')
 local Global = luajava.bindClass("org.luawars.LuaJScripting.LuaJGlobal")
 
+pCount = 0
+pTable = {}
+
+
 for k,v in pairs(_G) do
     print("Global key", k, "value", v)
 end
@@ -117,11 +121,13 @@ end
 
 -- PRIORITY FUNCTIONS
 function addPriority(functionName, parameterTable, priority)
-    return CallLua:addPriority(functionName, parameterTable, priority)
+    pCount = pCount + 1
+    pTable[pCount] = {functionName, parameterTable}
+    return CallLua:addPriority(functionName, parameterTable, priority, pCount)
 end
 
 function getTopPriority(...)
-    return CallLua:getTopPriority()
+    return pTable[CallLua:getTopPriority()]
 end
 
 function removeTopPriority(...)
