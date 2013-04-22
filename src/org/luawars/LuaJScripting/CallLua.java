@@ -58,6 +58,8 @@ public class CallLua extends TwoArgFunction {
     Player player;
     LuaJGlobal global;
 
+    public CallLua() {}
+
     public CallLua(GuiMenu menu, PlayerInput input) {
         this.menu = menu;
         this.input = input;
@@ -66,10 +68,10 @@ public class CallLua extends TwoArgFunction {
 
     public void reset(Player player) {
         menu.clear();
-        runScript("myScript.lua");
         this.player = player;
         // initialize lua j globals
         //global.init();
+        runScript("resources/Lua Scripts/myScript.lua");
     }
 
 	/**
@@ -115,9 +117,6 @@ public class CallLua extends TwoArgFunction {
 		Log.debug("LUA_PATH set to {}", G.package_.path);
 	}
 
-	public static LuaValue runScript(String fileNameWithPath) {
-		return runScript(fileNameWithPath, "");
-	}
 		/**
 		 * General method to run a Lua script.
 		 * Note: run script must be called before you can call callFunction.
@@ -128,27 +127,23 @@ public class CallLua extends TwoArgFunction {
 		 * @param scriptFileName - script to run
 		 * @return
 		 */
-	public static LuaValue runScript(String scriptFileName, String folderPath) {
+	public static LuaValue runScript(String scriptFileName) {
 		Log.trace("running script {}", scriptFileName);
 		try {
-			if(folderPath == null) {
-				folderPath = "resources/Lua Scripts/";
-			}
-
 			// to see how to use lua parser look at this
 			//https://github.com/headius/luaj/blob/master/README.html
 			// scroll down to parser section
 			//System.out.println("Calling " + folderPath + scriptFileName);
-			LuaParser parser = new LuaParser(new FileInputStream(folderPath + scriptFileName));
+			LuaParser parser = new LuaParser(new FileInputStream(scriptFileName));
 			Chunk chunk = parser.Chunk();
-			return G.loadFile(folderPath + scriptFileName).call();
+			return G.loadFile(scriptFileName).call();
 			// if we want our game to put anything, then put error message displays here
 		} catch(FileNotFoundException e) {
-			System.out.println("FILE NOT FOUND");
+			Log.error("FILE NOT FOUND: " + scriptFileName);
 		} catch(ParseException e) {
-			System.out.println("PARSE FAILED: " + e);
+			Log.error("PARSE FAILED: " + e);
 		} catch(LuaError e) {
-			System.out.println("LUA ERROR: " + e);
+			Log.error("LUA ERROR: " + e);
 		}
 		return NIL;
 	}
@@ -330,8 +325,8 @@ public class CallLua extends TwoArgFunction {
 		}
 	}
 
-	public class removeTopPriority extends SevenArgFunction {
-		public LuaValue call(LuaValue functionCall, LuaValue parameters, LuaValue priority, LuaValue NIL0, LuaValue NIL1, LuaValue NIL2, LuaValue NIL3) {
+	public class removeTopPriority extends ZeroArgFunction {
+		public LuaValue call() {
 			LuaTable topPriority = new LuaTable();
 			if(LuaJGlobal.AIpriorityQueue.size() > 0) {
 				topPriority.set(0, LuaJGlobal.AIpriorityQueue.peek().myFunction);

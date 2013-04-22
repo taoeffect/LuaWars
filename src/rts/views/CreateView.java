@@ -424,7 +424,7 @@ public class CreateView extends View {
             // Add the round and initialize the engine
             rounds.add(round);
             game.getEngine().setNetworkManager(netManager);
-            game.getEngine().initGame(rounds, true);
+            game.getEngine().initGame(rounds, false);
 
             // Load complete send it to server
             netManager.getClientState().isLoad = true;

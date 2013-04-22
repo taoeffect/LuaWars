@@ -69,7 +69,7 @@ public class GuiInGame {
                     if(message.startsWith("call ")) {
                         String fileName = message.substring(5, message.length());
                         Log.trace("attempting to call script: " + fileName + ".lua");
-                        CallLua.runScript(fileName, null);
+                        CallLua.runScript("resources/Lua Scripts/" + fileName);
                     }
                     message = "";
                     break;
@@ -110,7 +110,7 @@ public class GuiInGame {
                 }
             }
             // player can put stuff they want to update every frame in here
-            CallLua.runScript("update.lua", null);
+            CallLua.runScript("resources/Lua Scripts/update.lua");
             //
             g.drawImage(guiBackground, container.getWidth() - width, 0);
             if (container.getHeight() > guiBackground.getHeight()) {

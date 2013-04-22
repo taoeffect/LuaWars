@@ -448,7 +448,7 @@ public class Engine extends View {
             layers.get(i).clear();
         }
         gui.clear();
-        callLua.reset(getPlayer());
+        callLua.reset(null);//getPlayer());
 
         // add the new rounds
         this.rounds.addAll(rounds);
