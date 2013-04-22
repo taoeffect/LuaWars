@@ -66,24 +66,10 @@ public class LuaJGlobal {
 
     public int getPanelBuilding(int panelId) {
         // actualPanelId is because Lua starts it's index at 1 instead of 0
-        int actualPanelId = panelId - 1;
-        GuiPanel panel = menu.getPanels().get(actualPanelId);
+        GuiPanel panel = menu.getPanels().get(panelId);
         ArrayList<GuiButton> buttons = panel.getButtons();
         for(int j = 0; j < buttons.size(); j++) {
             if(!buttons.get(j).getProcessList().isEmpty()) {
-                return j;
-            }
-        }
-        return -1;
-    }
-
-    public int getPanelReady(int panelId) {
-        // actualPanelId is because Lua starts it's index at 1 instead of 0
-        int actualPanelId = panelId - 1;
-        GuiPanel panel = menu.getPanels().get(actualPanelId);
-        ArrayList<GuiButton> buttons = panel.getButtons();
-        for(int j = 0; j < buttons.size(); j++) {
-            if(!buttons.get(j).hasProcessReady()) {
                 return j;
             }
         }
@@ -106,7 +92,7 @@ public class LuaJGlobal {
 
 
 	// HashMap that contains all of the globals
-	public HashMap<String, LuaValue> luaJGlobal = new HashMap<String, LuaValue>();
+	public HashMap<String, String> luaJGlobal = new HashMap<String, String>();
 	/*
 		List of globals:
 		"baseX" - gives x location of last constructor made
@@ -122,21 +108,18 @@ public class LuaJGlobal {
 	public PriorityQueue<AIGamePriorities> AIpriorityQueue = new PriorityQueue<AIGamePriorities>();
 
 	public void initializeLuaJGlobal() {
-		luaJGlobal.put("baseX", LuaValue.NIL);
-		luaJGlobal.put("baseY", LuaValue.NIL);
 		for(int i = 0 ; i < Launch.g.getEngine().getGui().getMenuGui().getPanels().size(); i++) {
-			luaJGlobal.put("buildingPanel" + i, LuaValue.valueOf(-1));
-			luaJGlobal.put("buildingPanelReady" + i, LuaValue.valueOf(-1));
+			luaJGlobal.put("buildingPanel" + i, "-1");
+			luaJGlobal.put("buildingPanelReady" + i, "-1");
 		}
-		luaJGlobal.put("money", LuaValue.valueOf(Launch.g.getEngine().getPlayer().getMoney()));
+		luaJGlobal.put("money", String.valueOf(Launch.g.getEngine().getPlayer().getMoney()));
 	}
 	/**
 	 * Adds (or renews) globals from the game to this class which will then be able to interface with our LuaJ scripts
 	 * @param key
 	 * @param value
 	 */
-	public void addNewLuaJGlobal(String key, LuaValue value) {
-		removeLuaJGlobal(key);
+	public void addNewLuaJGlobal(String key, String value) {
 		luaJGlobal.put(key, value);
 	}
 
@@ -144,10 +127,7 @@ public class LuaJGlobal {
 		luaJGlobal.remove(key);
 	}
 
-	public LuaValue getLuaJGlobal(String key) {
-		if(luaJGlobal.get(key) == null)
-			return LuaValue.NIL;
-		else
-			return luaJGlobal.get(key);
+	public String getLuaJGlobal(String key) {
+		return luaJGlobal.get(key);
 	}
 }

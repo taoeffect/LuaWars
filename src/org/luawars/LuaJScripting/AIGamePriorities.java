@@ -21,7 +21,7 @@ public class AIGamePriorities implements Comparable<AIGamePriorities> {
         this.parameters = parameters;
         this.priority = priority;
         this.index = index;
-        Log.debug("Priority: " + myFunction + " params: " + parameters + " prio: " + priority + " index: " + index);
+        Log.trace("new AIGamePriorities(" + "" + myFunction + ", " + parameters + ", " + priority + ", " + index + ")");
     }
 
     @Override

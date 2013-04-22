@@ -191,26 +191,8 @@ public class CallLua {
 	 * 3 arguments instead of using VarArgFunction.
 	 */
 	public static void createUnit(int panelId, int buttonNum) {
-        Log.trace("calling createUnit function with panelId {}, buttonNum {}", panelId, buttonNum);
-        // Lua's indices start at 1 instead of 0
-        // so I'm converting them into java indices
-        int actualPanelID = panelId - 1;
-        int actualbuttonNum = buttonNum - 1;
-        ArrayList<GuiPanel> panels = me().menu.getPanels();
-        if(actualPanelID >= 0 && actualPanelID < panels.size()){
-
-            ArrayList<GuiButton> buttons = panels.get(actualPanelID).getButtons();
-            if(actualbuttonNum >= 0 && actualbuttonNum < buttons.size()) {
-                Log.trace("creating unit {}", buttons.get(actualbuttonNum));
-                buttons.get(actualbuttonNum).launchCreateEntityProcess();
-            }
-            else {
-                Log.error("Attempted to use button outside of button size range.");
-            }
-        }
-        else {
-            Log.error("Attempted to use panel outside of panel size range.");
-        }
+        Log.debug("calling createUnit function with panelId {}, buttonNum {}", panelId, buttonNum);
+        me().menu.getPanels().get(panelId).getButtons().get(buttonNum).launchCreateEntityProcess();
 	}
 
     // NOTE: THIS COULD MESS UP BECAUSE THERE ARE MULTIPLE UNITS THAT HAVE THE NAME BUILDER,
@@ -243,25 +225,15 @@ public class CallLua {
 	 * Returns a global variable for the player to use
 	 * Also updates all the global variables when called
 	 */
-	public static LuaJGlobal getLuaJGlobal() {
-		return me().global;
+	public static String getLuaJGlobal(String key) {
+		return me().global.getLuaJGlobal(key);
 	}
 
 	// right now it places the first building it finds (from the panels)
 	// even if you have both a building (from panel 0) and a wall (from panel 2) to place.
 	// I might need to extend it to use 4 arguments, panel and building, but for now, I'll leave it
-	public static void placeBuilding(int xLoc, int yLoc) {
-        ArrayList<GuiPanel> panels = me().menu.getPanels();
-        OUTERLOOP:
-        for(GuiPanel panel : panels) {
-            ArrayList<GuiButton> buttons = panel.getButtons();
-            for(GuiButton button : buttons) {
-                if(button.placeBuilding(xLoc, yLoc))
-                {
-                    break OUTERLOOP;
-                }
-            }
-        }
+	public static void placeBuilding(int xLoc, int yLoc, int panel, int button) {
+        me().menu.getPanels().get(panel).getButtons().get(button).placeBuilding(xLoc, yLoc);
     }
 
 	public static void setUpBase() {
@@ -273,36 +245,24 @@ public class CallLua {
 	}
 
 	public static void addPriority(LuaValue functionCall, LuaValue parameters, int priority, int index) {
+        if (priority < 0) priority = 0;
         me().global.AIpriorityQueue.add(new AIGamePriorities(functionCall, parameters, priority, index));
 	}
 
-//	public static LuaValue removeTopPriority() {
-//        int topPriority = null;
-//        if(me().global.AIpriorityQueue.size() > 0) {
-//            topPriority = new LuaTable();
-//            topPriority.set(1, me().global.AIpriorityQueue.peek().myFunction);
-//            topPriority.set(2, me().global.AIpriorityQueue.peek().parameters);
-//            me().global.AIpriorityQueue.poll();
-//        }
-//        return topPriority;
-//	}
+    public static boolean isUnitReady(int panelId, int buttonID) {
+        return me().menu.getPanels().get(panelId).getButtons().get(buttonID).hasProcessReady();
+    }
 
-//	public static LuaTable getTopPriority() {
-//        LuaTable topPriority = null;
-//        if(me().global.AIpriorityQueue.peek() != null) {
-//            topPriority = new LuaTable();
-//            Log.debug("getTopPriority: " + me().global.AIpriorityQueue.peek());
-//            topPriority.set(1, me().global.AIpriorityQueue.peek().myFunction);
-//            topPriority.set(2, me().global.AIpriorityQueue.peek().parameters);
-//        }
-//        return topPriority;
-//	}
+    public static int numPrios() {
+        return me().global.AIpriorityQueue.size();
+    }
 
     public static int removeTopPriority() {
         int topPriority = 0;
         if(me().global.AIpriorityQueue.size() > 0) {
             topPriority = me().global.AIpriorityQueue.peek().index;
             me().global.AIpriorityQueue.poll();
+            Log.trace("queue size: " + me().global.AIpriorityQueue.size());
         }
         return topPriority;
     }
