@@ -1,10 +1,12 @@
 -- this file updates every frame
 
-if(getTopPriority()) then
-    priorityFunction = getTopPriority()[1]
-    priorityParameters = getTopPriority()[2]
-    --print(priorityFunction)
-    --print(table.unpack(priorityParameters))
+local tp = getTopPriority()
+
+if (tp) then
+    priorityFunction = tp[1]
+    priorityParameters = tp[2]
+    print(priorityParameters)
+    print(table.unpack(priorityParameters))
     priorityFunction(table.unpack(priorityParameters))
     --print('has top priority')
     --removeTopPriority()

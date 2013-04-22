@@ -21,7 +21,7 @@ import rts.core.Game;
  * This class represent advance game state like "in game" phases.
  * 
  * @author Vincent PIRAULT
- * 
+ *
  */
 public abstract class View extends BasicGameState {
 

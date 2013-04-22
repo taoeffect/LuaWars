@@ -373,7 +373,7 @@ public class Engine extends View {
         input.update(container, gui.isMouseOnGui(container, mx, my), mx, my, -xScrollDecal, -yScrollDecal);
 
         // player can put stuff they want to update every frame in here
-        CallLua.runScript("resources/Lua Scripts/update.lua", callLua);
+        callLua.runScript("resources/Lua Scripts/update.lua");
 
 
         // Mettre � 0 le nombres d'entit�s
@@ -774,6 +774,10 @@ public class Engine extends View {
     }
 
     // Others
+
+    public CallLua getPlayerLua() {
+        return callLua;
+    }
 
     public Map getMap() {
         return rounds.get(currentRound).getMap();

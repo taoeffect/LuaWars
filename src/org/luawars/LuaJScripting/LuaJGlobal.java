@@ -106,7 +106,7 @@ public class LuaJGlobal {
 
 
 	// HashMap that contains all of the globals
-	public static HashMap<String, LuaValue> luaJGlobal = new HashMap<String, LuaValue>();
+	public HashMap<String, LuaValue> luaJGlobal = new HashMap<String, LuaValue>();
 	/*
 		List of globals:
 		"baseX" - gives x location of last constructor made
@@ -119,9 +119,9 @@ public class LuaJGlobal {
 	 */
 
 
-	public static PriorityQueue<AIGamePriorities> AIpriorityQueue = new PriorityQueue<AIGamePriorities>();
+	public PriorityQueue<AIGamePriorities> AIpriorityQueue = new PriorityQueue<AIGamePriorities>();
 
-	public static void initializeLuaJGlobal() {
+	public void initializeLuaJGlobal() {
 		luaJGlobal.put("baseX", LuaValue.NIL);
 		luaJGlobal.put("baseY", LuaValue.NIL);
 		for(int i = 0 ; i < Launch.g.getEngine().getGui().getMenuGui().getPanels().size(); i++) {
@@ -135,16 +135,16 @@ public class LuaJGlobal {
 	 * @param key
 	 * @param value
 	 */
-	public static void addNewLuaJGlobal(String key, LuaValue value) {
+	public void addNewLuaJGlobal(String key, LuaValue value) {
 		removeLuaJGlobal(key);
 		luaJGlobal.put(key, value);
 	}
 
-	public static void removeLuaJGlobal(String key) {
+	public void removeLuaJGlobal(String key) {
 		luaJGlobal.remove(key);
 	}
 
-	public static LuaValue getLuaJGlobal(String key) {
+	public LuaValue getLuaJGlobal(String key) {
 		if(luaJGlobal.get(key) == null)
 			return LuaValue.NIL;
 		else

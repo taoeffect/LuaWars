@@ -3,8 +3,8 @@ print("running myScript");
 
 -- note that i didn't have to say CallLua = "XXX"
 -- but if i had just had the require statement, then i would have to call
--- org.luawars.LuaJScripting.CallLua.createEntity(x1, x2), at least i think this
-CallLua = require 'org.luawars.LuaJScripting.CallLua'
+-- org.luawars.LuaJScripting.CallLua:createEntity(x1, x2), at least i think this
+CallLua = luajava.bindClass('org.luawars.LuaJScripting.CallLua')
 local Global = luajava.bindClass("org.luawars.LuaJScripting.LuaJGlobal")
 
 for k,v in pairs(_G) do
@@ -21,7 +21,7 @@ end
 function createUnit(panelId, buttonNum, ...)
     if(panelId and buttonNum) then
         print("creating script")
-        CallLua.createUnit(panelId, buttonNum)
+        CallLua:createUnit(panelId, buttonNum)
         removeTopPriority()
         return true
     end
@@ -37,7 +37,7 @@ function selectUnits(tileCoordinate, unitType, numUnits, radius, ...)
     radius = radius or 1000
     numUnits = numUnits or 1000
     if(tileCoordinate) then
-        CallLua.selectUnits(tileCoordinate.x, tileCoordinate.y, radius, numUnits, unitType)
+        CallLua:selectUnits(tileCoordinate.x, tileCoordinate.y, radius, numUnits, unitType)
         removeTopPriority()
         return true
     end
@@ -45,10 +45,8 @@ end
 
 -- deselects all units
 function deselectUnits(...)
-    CallLua.deselectUnits()
-    print('test!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+    CallLua:deselectUnits()
     removeTopPriority()
-    print('TEST!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
     return true
 end
 
@@ -58,7 +56,7 @@ end
 -- @param: tileY - y tile coordinate where you want to move or do the special action
 function moveOrSpecialAction(tileCoordinate, ...)
     if(tileCoordinate) then
-        CallLua.moveOrSpecialAction(tileCoordinate.x, tileCoordinate.y)
+        CallLua:moveOrSpecialAction(tileCoordinate.x, tileCoordinate.y)
         removeTopPriority()
     end
     return true
@@ -75,7 +73,7 @@ function placeBuilding(tileCoordinate, ...)
     end
     -- if we've finished a building, then we can place it
     if(tileCoordinate) then
-        CallLua.placeBuilding(tileCoordinate.x, tileCoordinate.y)
+        CallLua:placeBuilding(tileCoordinate.x, tileCoordinate.y)
         removeTopPriority()
         return true
     -- if you can't place the building at tileX, tileY, then just remove the top priority
@@ -86,7 +84,7 @@ end
 -- if you want to set up your base at a specific location, move your builder there
 -- then call this function
 function setUpBase(...)
-    CallLua.setUpBase()
+    CallLua:setUpBase()
     removeTopPriority()
     return true
 end
@@ -100,7 +98,7 @@ function getGlobal(globalVarName, ...)
     -- i thought that this name (getLuaJGlobal) provided more clarity for the name
     -- but that it was redundant in lua code
     if(globalVarName) then
-        return CallLua.getLuaJGlobal(globalVarName)
+        return CallLua:getLuaJGlobal(globalVarName)
     end
 end
 
@@ -108,35 +106,35 @@ end
 -- @param :
 function drawText(screenCoordinate, text, ...)
     if(screenCoordinate and text) then
-        CallLua.drawText(screenCoordinate.x, screenCoordinate.y, text)
+        CallLua:drawText(screenCoordinate.x, screenCoordinate.y, text)
         return true
     end
 end
 
 function selectUnitsAttack(tileX, tileY)
-    CallLua.setUpBase(tileX, tileY)
+    CallLua:setUpBase(tileX, tileY)
 end
 
 -- PRIORITY FUNCTIONS
 function addPriority(functionName, parameterTable, priority)
-    return CallLua.addPriority(functionName, parameterTable, priority)
+    return CallLua:addPriority(functionName, parameterTable, priority)
 end
 
 function getTopPriority(...)
-    return CallLua.getTopPriority()
+    return CallLua:getTopPriority()
 end
 
 function removeTopPriority(...)
     print('removing top priority')
-    return CallLua.removeTopPriority()
+    return CallLua:removeTopPriority()
 end
 
 function getAllPriorities(...)
-    return CallLua.getAllPriorities()
+    return CallLua:getAllPriorities()
 end
 
 
 function clearPriorities(...)
-    CallLua.clearPriorities()
+    CallLua:clearPriorities()
     return true
 end

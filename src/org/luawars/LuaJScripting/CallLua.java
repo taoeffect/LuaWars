@@ -29,7 +29,7 @@ import java.util.HashMap;
  * To change this template use File | Settings | File Templates.
  *
  * This class is an interface between Lua and Java. The code in this class mainly interacts
- * with static global variables in the LuaJGlobal.java file.
+ * with static global variables in the me().global.java file.
  *
  * @TODO
  * attack/target
@@ -54,18 +54,16 @@ import java.util.HashMap;
  */
 public class CallLua {
 	public static Globals G = JsePlatform.standardGlobals();
-
     private static HashMap<Integer, CallLua> intToCallLua = new HashMap<Integer, CallLua>();
-    static GuiMenu menu;
-    static PlayerInput input;
-    Player player;
-    public LuaJGlobal global;
 
-    public CallLua() {}
+    GuiMenu menu;
+    PlayerInput input;
+    Player player;
+    LuaJGlobal global;
 
     public CallLua(GuiMenu menu, PlayerInput input) {
-        CallLua.menu = menu;
-        CallLua.input = input;
+        this.menu = menu;
+        this.input = input;
         global = new LuaJGlobal(menu, input, null); // player is uninitialzed right now
     }
 
@@ -74,7 +72,7 @@ public class CallLua {
         this.player = player;
         // initialize lua j globals
         //global.init();
-        runScript("resources/Lua Scripts/myScript.lua", this);
+        runScript("resources/Lua Scripts/myScript.lua");
     }
 
 	/**
@@ -85,6 +83,11 @@ public class CallLua {
 		CallLua.G.package_.setLuaPath(path);
 		Log.debug("LUA_PATH set to {}", G.package_.path);
 	}
+
+    private static CallLua me() {
+        Log.debug(Log.me() + " fetching: " + G.get("cuid").toint());
+        return intToCallLua.get(G.get("cuid").toint());
+    }
 
     /**
     * General method to run a Lua script.
@@ -97,7 +100,7 @@ public class CallLua {
     * @return
     */
 
-	public static void runScript(String scriptFileName, CallLua bitch) {
+	public void runScript(String scriptFileName) {
 		Log.trace("running script {}", scriptFileName);
 		try {
 			// to see how to use lua parser look at this
@@ -106,7 +109,9 @@ public class CallLua {
 			//System.out.println("Calling " + folderPath + scriptFileName);
 			LuaParser parser = new LuaParser(new FileInputStream(scriptFileName));
 			parser.Chunk();
-            G.set("cuid", System.identityHashCode(bitch));
+            int hash = System.identityHashCode(this);
+            G.set("cuid", hash);
+            intToCallLua.put(hash, this);
 			G.loadFile(scriptFileName).call();
 			// if we want our game to put anything, then put error message displays here
 		} catch(FileNotFoundException e) {
@@ -187,14 +192,11 @@ public class CallLua {
 	 */
 	public static void createUnit(int panelId, int buttonNum) {
         Log.trace("calling createUnit function with panelId {}, buttonNum {}", panelId, buttonNum);
-
-        Log.debug("player " + intToCallLua.get(G.get("cuid")) + " creating a unit: " + buttonNum);
-
         // Lua's indices start at 1 instead of 0
         // so I'm converting them into java indices
         int actualPanelID = panelId - 1;
         int actualbuttonNum = buttonNum - 1;
-        ArrayList<GuiPanel> panels = menu.getPanels();
+        ArrayList<GuiPanel> panels = me().menu.getPanels();
         if(actualPanelID >= 0 && actualPanelID < panels.size()){
 
             ArrayList<GuiButton> buttons = panels.get(actualPanelID).getButtons();
@@ -220,18 +222,21 @@ public class CallLua {
         // if unit type is NIL, then make tempUnitType null,
         // or if the unit name is provided then select that unit
         String tempUnitType = unitType == null ? null : unitType;
-        input.selectUnitsAt(tileX, tileY, radius, numUnits, tempUnitType);
+        me().input.selectUnitsAt(tileX, tileY, radius, numUnits, tempUnitType);
 	}
 
 	public static void deselectUnits() {
-        input.deselectUnits();
+        CallLua f = me();
+        if (f == null) Log.error("me() is null!!!!!!!!!!!");
+        else if (f.input == null) Log.error("f.input == null!!!!");
+        me().input.deselectUnits();
 	}
 
     // the lua version takes in tile coordinates
     // however moveOrSpecialAction takes in x, y coordinates (i.e. pixel coordinates)
     // so we need to convert the tiles to pixel coordinates
 	public static void moveOrSpecialAction(int tileX, int tileY) {
-        input.moveOrSpecialAction(tileX * Launch.g.getEngine().getTileW(), tileY * Launch.g.getEngine().getTileH());
+        me().input.moveOrSpecialAction(tileX * Launch.g.getEngine().getTileW(), tileY * Launch.g.getEngine().getTileH());
 	}
 
 	/**
@@ -239,14 +244,14 @@ public class CallLua {
 	 * Also updates all the global variables when called
 	 */
 	public static LuaJGlobal getLuaJGlobal() {
-		return intToCallLua.get(G.get("cuid")).global;
+		return me().global;
 	}
 
 	// right now it places the first building it finds (from the panels)
 	// even if you have both a building (from panel 0) and a wall (from panel 2) to place.
 	// I might need to extend it to use 4 arguments, panel and building, but for now, I'll leave it
 	public static void placeBuilding(int xLoc, int yLoc) {
-        ArrayList<GuiPanel> panels = menu.getPanels();
+        ArrayList<GuiPanel> panels = me().menu.getPanels();
         OUTERLOOP:
         for(GuiPanel panel : panels) {
             ArrayList<GuiButton> buttons = panel.getButtons();
@@ -260,8 +265,7 @@ public class CallLua {
     }
 
 	public static void setUpBase() {
-        Log.debug("player " + G.get("playerID") + " setting up base");
-        input.setUpBase();
+        me().input.setUpBase();
 	}
 
 	public static void drawText(int xCoordinate, int yCoordinate, String text) {
@@ -269,31 +273,31 @@ public class CallLua {
 	}
 
 	public static void addPriority(LuaValue functionCall, LuaValue parameters, int priority) {
-        LuaJGlobal.AIpriorityQueue.add(new AIGamePriorities(functionCall, parameters, priority));
+        me().global.AIpriorityQueue.add(new AIGamePriorities(functionCall, parameters, priority));
 	}
 
 	public static LuaValue removeTopPriority() {
         LuaTable topPriority = null;
-        if(LuaJGlobal.AIpriorityQueue.size() > 0) {
+        if(me().global.AIpriorityQueue.size() > 0) {
             topPriority = new LuaTable();
-            topPriority.set(0, LuaJGlobal.AIpriorityQueue.peek().myFunction);
-            topPriority.set(1, LuaJGlobal.AIpriorityQueue.peek().parameters);
-            LuaJGlobal.AIpriorityQueue.poll();
+            topPriority.set(1, me().global.AIpriorityQueue.peek().myFunction);
+            topPriority.set(2, me().global.AIpriorityQueue.peek().parameters);
+            me().global.AIpriorityQueue.poll();
         }
-        return topPriority != null ? topPriority : LuaValue.NIL;
+        return topPriority;
 	}
 
 	public static LuaValue getTopPriority() {
         LuaTable topPriority = null;
-        if(LuaJGlobal.AIpriorityQueue.peek() != null) {
+        if(me().global.AIpriorityQueue.peek() != null) {
             topPriority = new LuaTable();
-            topPriority.set(1, LuaJGlobal.AIpriorityQueue.peek().myFunction);
-            topPriority.set(2, LuaJGlobal.AIpriorityQueue.peek().parameters);
+            topPriority.set(1, me().global.AIpriorityQueue.peek().myFunction);
+            topPriority.set(2, me().global.AIpriorityQueue.peek().parameters);
         }
-        return topPriority != null ? topPriority : LuaValue.NIL;
+        return topPriority;
 	}
 
 	public static void clearPriorities() {
-        LuaJGlobal.AIpriorityQueue.clear();
+        me().global.AIpriorityQueue.clear();
 	}
 }

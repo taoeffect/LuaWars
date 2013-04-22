@@ -38,11 +38,6 @@ public class BuilderMover extends Mover {
             }
 
             if (ok) {
-                // TRUNG NGUYEN
-                // when you set up a base, set the baseX and baseY location
-                LuaJGlobal.addNewLuaJGlobal("baseX", LuaValue.valueOf(tx));
-                LuaJGlobal.addNewLuaJGlobal("baseY", LuaValue.valueOf(ty));
-                //
                 remove();
                 if (engine.isNetwork()) {
                     engine.getNetworkManager().sendCreateEntity(EData.BUILDING_BUILDER, playerId, teamId, x, y - 40);
