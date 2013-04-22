@@ -1,23 +1,26 @@
 -- This lua script pretty much acts as our Lua Library for Lua Wars
-print("running myScript.lua");
+print("running myScript");
 
 -- note that i didn't have to say CallLua = "XXX"
 -- but if i had just had the require statement, then i would have to call
 -- org.luawars.LuaJScripting.CallLua.createEntity(x1, x2), at least i think this
 CallLua = require 'org.luawars.LuaJScripting.CallLua'
+local Global = luajava.bindClass("org.luawars.LuaJScripting.LuaJGlobal")
+
+for k,v in pairs(_G) do
+    print("Global key", k, "value", v)
+end
 
 -- On the right side of the screen, it has the 4 panels and each panel has buttons on it
 -- creates a unit (this includes buildings too) based on which panel/button you choose
 -- note that buttons go from topleft to bottom right
 -- for example, if you build (panelId = 0 and buttonNum = 0) it will create a barracks
 -- or if you build (panelId = 1, and buttonNum = 1) it will create a soldierXXX?
--- @param: panelId - takes an integer (0 to 3 inclusive)
--- @param: buttonNum - takes an integer (0 to X, where X is dependent on the panel)
+-- @param: panelId - takes an integer (1 to 5 inclusive)
+-- @param: buttonNum - takes an integer (1 to X, where X is dependent on the panel)
 function createUnit(panelId, buttonNum, ...)
-    --print("HELLO")
-    --print(getGlobal('buildingPanel' .. panelId))
-    if(panelId and buttonNum and getGlobal('buildingPanel' .. panelId) == -1) then
-        --print("creating script")
+    if(panelId and buttonNum) then
+        print("creating script")
         CallLua.createUnit(panelId, buttonNum)
         removeTopPriority()
         return true
@@ -43,7 +46,9 @@ end
 -- deselects all units
 function deselectUnits(...)
     CallLua.deselectUnits()
+    print('test!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
     removeTopPriority()
+    print('TEST!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
     return true
 end
 
@@ -63,7 +68,13 @@ end
 -- @param: tileX - x tile coordinate where you want to place the building
 -- @param: tileY - y tile coordinate where you want to place the building
 function placeBuilding(tileCoordinate, ...)
-    if(tileCoordinate and (getGlobal('buildingPanelReady0') > -1 or getGlobal('buildingPanelReady2') > -1)) then
+    -- if we're not building a building, we can't place anything
+    -- so just remove the priority
+    if(tileCoordinate) then
+        removeTopPriority()
+    end
+    -- if we've finished a building, then we can place it
+    if(tileCoordinate) then
         CallLua.placeBuilding(tileCoordinate.x, tileCoordinate.y)
         removeTopPriority()
         return true
@@ -100,10 +111,6 @@ function drawText(screenCoordinate, text, ...)
         CallLua.drawText(screenCoordinate.x, screenCoordinate.y, text)
         return true
     end
-end
-
-function setUpBase()
-    CallLua.setUpBase()
 end
 
 function selectUnitsAttack(tileX, tileY)

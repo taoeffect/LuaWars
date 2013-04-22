@@ -227,6 +227,12 @@ public class PlayerInput {
         return selectedUnits;
     }
 
+    public void deselectUnits() {
+        for(ActiveEntity ae : selected) {
+            ae.deselected();
+        }
+    }
+
     public void setUpBase() {
         ArrayList<ActiveEntity> selectedUnits = selectUnitsAt(0, 0, 10000, 1, "Builder"); // add a way to select specific type of unit
         if(selectedUnits.size() > 0) {
