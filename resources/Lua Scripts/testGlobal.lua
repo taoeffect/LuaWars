@@ -1,1 +1,0 @@
-print("running testGlobal script")

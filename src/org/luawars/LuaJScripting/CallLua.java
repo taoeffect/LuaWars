@@ -72,7 +72,7 @@ public class CallLua {
         this.player = player;
         // initialize lua j globals
         //global.init();
-        runScript("resources/Lua Scripts/myScript.lua");
+        runScript("resources/Lua Scripts/library.lua");
     }
 
 	/**

@@ -52,7 +52,7 @@ public class GuiInGame {
         this.patch = ResourceManager.getImage("ihmpatch");
         this.menuGui.init();
         // TRUNG NGUYEN
-        //CallLua.runScript("myScript.lua", null);
+        //CallLua.runScript("library.lua", null);
         //LuaJGlobal.initializeLuaJGlobal();
     }
 
