@@ -1,5 +1,4 @@
 print ('ZZZZZZZ')
-require 'myscript'
 
 deselectUnits()
 addPriority(setUpBase, {}, 300)

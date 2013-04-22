@@ -53,16 +53,16 @@ import java.util.ArrayList;
  */
 public class CallLua extends TwoArgFunction {
 	public static Globals G = JsePlatform.standardGlobals();
-    GuiMenu menu;
-    PlayerInput input;
+    static GuiMenu menu;
+    static PlayerInput input;
     Player player;
     LuaJGlobal global;
 
     public CallLua() {}
 
     public CallLua(GuiMenu menu, PlayerInput input) {
-        this.menu = menu;
-        this.input = input;
+        CallLua.menu = menu;
+        CallLua.input = input;
         global = new LuaJGlobal(menu, input, null); // player is uninitialzed right now
     }
 
@@ -117,16 +117,19 @@ public class CallLua extends TwoArgFunction {
 		Log.debug("LUA_PATH set to {}", G.package_.path);
 	}
 
-		/**
-		 * General method to run a Lua script.
-		 * Note: run script must be called before you can call callFunction.
-		 * I'm not exactly sure why. I think it is because Lua puts all the functions' addresses on a table by
-		 * calling runScript, and once the functions are on a table, calling a function will make Lua
-		 * look at the table to see what address to go to
-		 *
-		 * @param scriptFileName - script to run
-		 * @return
-		 */
+    /**
+    * General method to run a Lua script.
+    * Note: run script must be called before you can call callFunction.
+    * I'm not exactly sure why. I think it is because Lua puts all the functions' addresses on a table by
+    * calling runScript, and once the functions are on a table, calling a function will make Lua
+    * look at the table to see what address to go to
+    *
+    * @param scriptFileName - script to run
+    * @return
+    */
+
+    private static int pID = 0;
+
 	public static LuaValue runScript(String scriptFileName) {
 		Log.trace("running script {}", scriptFileName);
 		try {
@@ -135,7 +138,8 @@ public class CallLua extends TwoArgFunction {
 			// scroll down to parser section
 			//System.out.println("Calling " + folderPath + scriptFileName);
 			LuaParser parser = new LuaParser(new FileInputStream(scriptFileName));
-			Chunk chunk = parser.Chunk();
+			parser.Chunk();
+            G.set("playerID", pID++);
 			return G.loadFile(scriptFileName).call();
 			// if we want our game to put anything, then put error message displays here
 		} catch(FileNotFoundException e) {
@@ -215,9 +219,11 @@ public class CallLua extends TwoArgFunction {
 	 * NOTE: I ALSO MADE A SevenArgFunction class. You can use this if you need to create a function with more than
 	 * 3 arguments instead of using VarArgFunction.
 	 */
-	public class createUnit extends TwoArgFunction {
+	public static class createUnit extends TwoArgFunction {
 		public LuaValue call(LuaValue panelId, LuaValue buttonNum) {
 			Log.trace("calling createUnit function with panelId {}, buttonNum {}", panelId, buttonNum);
+
+            Log.debug("player " + G.get("playerID") + " creating a unit: " + buttonNum);
 
             // Lua's indices start at 1 instead of 0
             // so I'm converting them into java indices
@@ -242,7 +248,7 @@ public class CallLua extends TwoArgFunction {
 		}
 	}
 
-	public class selectUnits extends SevenArgFunction {
+	public static class selectUnits extends SevenArgFunction {
 		// NOTE: THIS COULD MESS UP BECAUSE THERE ARE MULTIPLE UNITS THAT HAVE THE NAME BUILDER,
 		// LIKEWISE THERE ARE MULTIPLE UNITS WITH THE NAME SCOUT
 		public LuaValue call(LuaValue tileX, LuaValue tileY, LuaValue radius, LuaValue numUnits, LuaValue unitType, LuaValue NIL1, LuaValue NIL2) {
@@ -257,14 +263,14 @@ public class CallLua extends TwoArgFunction {
 		}
 	}
 
-	public class deselectUnits extends SevenArgFunction {
+	public static class deselectUnits extends SevenArgFunction {
 		public LuaValue call(LuaValue NIL0, LuaValue NIL1, LuaValue NIL2, LuaValue NIL3, LuaValue NIL4, LuaValue NIL5, LuaValue NIL6) {
 			input.deselectUnits();
 			return NIL;
 		}
 	}
 
-	public class moveOrSpecialAction extends TwoArgFunction {
+	public static class moveOrSpecialAction extends TwoArgFunction {
 		// the lua version takes in tile coordinates
 		// however moveOrSpecialAction takes in x, y coordinates (i.e. pixel coordinates)
 		// so we need to convert the tiles to pixel coordinates
@@ -278,7 +284,7 @@ public class CallLua extends TwoArgFunction {
 	 * Returns a global variable for the player to use
 	 * Also updates all the global variables when called
 	 */
-	public class getLuaJGlobal extends OneArgFunction {
+	public static class getLuaJGlobal extends OneArgFunction {
 		public LuaValue call(LuaValue globalVarName) {
 			return NIL;
 		}
@@ -287,7 +293,7 @@ public class CallLua extends TwoArgFunction {
 	// right now it places the first building it finds (from the panels)
 	// even if you have both a building (from panel 0) and a wall (from panel 2) to place.
 	// I might need to extend it to use 4 arguments, panel and building, but for now, I'll leave it
-	public class placeBuilding extends TwoArgFunction {
+	public static class placeBuilding extends TwoArgFunction {
 		public LuaValue call(LuaValue xLoc, LuaValue yLoc) {
 			ArrayList<GuiPanel> panels = menu.getPanels();
 			OUTERLOOP:
@@ -304,28 +310,29 @@ public class CallLua extends TwoArgFunction {
 		}
 	}
 
-	public class setUpBase extends ZeroArgFunction {
+	public static class setUpBase extends ZeroArgFunction {
 		public LuaValue call() {
+            Log.debug("player " + G.get("playerID") + " setting up base");
 			input.setUpBase();
 			return NIL;
 		}
 	}
 
-	public class drawText extends SevenArgFunction {
+	public static class drawText extends SevenArgFunction {
 		public LuaValue call(LuaValue xCoordinate, LuaValue yCoordinate, LuaValue text, LuaValue NIL0, LuaValue NIL1, LuaValue NIL2, LuaValue NIL3) {
 			Launch.g.getEngine().getContainer().getGraphics().drawString(text.tojstring(), xCoordinate.toint(), yCoordinate.toint());
 			return NIL;
 		}
 	}
 
-	public class addPriority extends SevenArgFunction {
+	public static class addPriority extends SevenArgFunction {
 		public LuaValue call(LuaValue functionCall, LuaValue parameters, LuaValue priority, LuaValue NIL0, LuaValue NIL1, LuaValue NIL2, LuaValue NIL3) {
 			LuaJGlobal.AIpriorityQueue.add(new AIGamePriorities(functionCall, parameters, priority));
 			return NIL;
 		}
 	}
 
-	public class removeTopPriority extends ZeroArgFunction {
+	public static class removeTopPriority extends ZeroArgFunction {
 		public LuaValue call() {
 			LuaTable topPriority = new LuaTable();
 			if(LuaJGlobal.AIpriorityQueue.size() > 0) {
@@ -338,7 +345,7 @@ public class CallLua extends TwoArgFunction {
 		}
 	}
 
-	public class getTopPriority extends SevenArgFunction {
+	public static class getTopPriority extends SevenArgFunction {
 		public LuaValue call(LuaValue NIL0, LuaValue NIL1, LuaValue NIL2, LuaValue NIL3, LuaValue NIL4, LuaValue NIL5, LuaValue NIL6) {
 			LuaTable topPriority = new LuaTable();
 			if(LuaJGlobal.AIpriorityQueue.peek() != null) {
@@ -353,7 +360,7 @@ public class CallLua extends TwoArgFunction {
 		}
 	}
 
-//    public class getAllPriorities extends SevenArgFunction {
+//    public static class getAllPriorities extends SevenArgFunction {
 //        public LuaValue call(LuaValue NIL0, LuaValue NIL1, LuaValue NIL2, LuaValue NIL3, LuaValue NIL4, LuaValue NIL5, LuaValue NIL6) {
 //            LuaTable allPriorities = new LuaTable();
 //            int i = 0;
@@ -368,7 +375,7 @@ public class CallLua extends TwoArgFunction {
 //        }
 //    }
 
-	public class clearPriorities extends SevenArgFunction {
+	public static class clearPriorities extends SevenArgFunction {
 		public LuaValue call(LuaValue functionCall, LuaValue yCoordinate, LuaValue text, LuaValue NIL0, LuaValue NIL1, LuaValue NIL2, LuaValue NIL3) {
 			LuaJGlobal.AIpriorityQueue.clear();
 			return NIL;

@@ -7,6 +7,10 @@ print("running myScript");
 CallLua = require 'org.luawars.LuaJScripting.CallLua'
 local Global = luajava.bindClass("org.luawars.LuaJScripting.LuaJGlobal")
 
+for k,v in pairs(_G) do
+    print("Global key", k, "value", v)
+end
+
 -- On the right side of the screen, it has the 4 panels and each panel has buttons on it
 -- creates a unit (this includes buildings too) based on which panel/button you choose
 -- note that buttons go from topleft to bottom right
@@ -15,7 +19,7 @@ local Global = luajava.bindClass("org.luawars.LuaJScripting.LuaJGlobal")
 -- @param: panelId - takes an integer (1 to 5 inclusive)
 -- @param: buttonNum - takes an integer (1 to X, where X is dependent on the panel)
 function createUnit(panelId, buttonNum, ...)
-    if(panelId and buttonNum and Global.panelBuilding[panelBuilding] == -1) then
+    if(panelId and buttonNum) then
         print("creating script")
         CallLua.createUnit(panelId, buttonNum)
         removeTopPriority()
@@ -42,7 +46,9 @@ end
 -- deselects all units
 function deselectUnits(...)
     CallLua.deselectUnits()
+    print('test!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
     removeTopPriority()
+    print('TEST!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
     return true
 end
 
@@ -64,11 +70,11 @@ end
 function placeBuilding(tileCoordinate, ...)
     -- if we're not building a building, we can't place anything
     -- so just remove the priority
-    if(tileCoordinate and (getGlobal('buildingPanel0') > -1 or getGlobal('buildingPanel2') > -1)) then
+    if(tileCoordinate) then
         removeTopPriority()
     end
     -- if we've finished a building, then we can place it
-    if(tileCoordinate and (getGlobal('buildingPanelReady0') > -1 or getGlobal('buildingPanelReady2') > -1)) then
+    if(tileCoordinate) then
         CallLua.placeBuilding(tileCoordinate.x, tileCoordinate.y)
         removeTopPriority()
         return true
@@ -105,10 +111,6 @@ function drawText(screenCoordinate, text, ...)
         CallLua.drawText(screenCoordinate.x, screenCoordinate.y, text)
         return true
     end
-end
-
-function setUpBase()
-    CallLua.setUpBase()
 end
 
 function selectUnitsAttack(tileX, tileY)
