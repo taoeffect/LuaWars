@@ -66,11 +66,6 @@ public class GuiInGame {
                         addMessage(engine.getNetworkManager().sendMessage(message));
                     }
                     speakMod = false;
-                    if(message.startsWith("call ")) {
-                        String fileName = message.substring(5, message.length());
-                        Log.trace("attempting to call script: " + fileName + ".lua");
-                        CallLua.runScript("resources/Lua Scripts/" + fileName);
-                    }
                     message = "";
                     break;
                 case Input.KEY_ESCAPE:
@@ -109,8 +104,6 @@ public class GuiInGame {
                     g.drawString(((x - Launch.g.getEngine().getXScrollDecal()) / Launch.g.getEngine().getTileW()) + ", " + ((y - Launch.g.getEngine().getYScrollDecal()) / Launch.g.getEngine().getTileH()), x, y);
                 }
             }
-            // player can put stuff they want to update every frame in here
-            CallLua.runScript("resources/Lua Scripts/update.lua");
             //
             g.drawImage(guiBackground, container.getWidth() - width, 0);
             if (container.getHeight() > guiBackground.getHeight()) {

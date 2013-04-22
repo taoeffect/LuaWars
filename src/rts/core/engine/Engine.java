@@ -372,6 +372,10 @@ public class Engine extends View {
         // UPDATE MOUSE MOVE AND CLICK
         input.update(container, gui.isMouseOnGui(container, mx, my), mx, my, -xScrollDecal, -yScrollDecal);
 
+        // player can put stuff they want to update every frame in here
+        CallLua.runScript("resources/Lua Scripts/update.lua", callLua);
+
+
         // Mettre � 0 le nombres d'entit�s
         resetEntsCount();
 

@@ -19,6 +19,7 @@ import rts.core.engine.ingamegui.GuiPanel;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created with IntelliJ IDEA.
@@ -51,12 +52,14 @@ import java.util.ArrayList;
  * - I've been testing everything in GuiInGame.java in the keyPressed() function. You can turn it on by pressing 'y'
  * and submit the command by pressing enter.
  */
-public class CallLua extends TwoArgFunction {
+public class CallLua {
 	public static Globals G = JsePlatform.standardGlobals();
+
+    private static HashMap<Integer, CallLua> intToCallLua = new HashMap<Integer, CallLua>();
     static GuiMenu menu;
     static PlayerInput input;
     Player player;
-    LuaJGlobal global;
+    public LuaJGlobal global;
 
     public CallLua() {}
 
@@ -71,42 +74,8 @@ public class CallLua extends TwoArgFunction {
         this.player = player;
         // initialize lua j globals
         //global.init();
-        runScript("resources/Lua Scripts/myScript.lua");
+        runScript("resources/Lua Scripts/myScript.lua", this);
     }
-
-	/**
-	 * When the code:
-	 * require 'org.luawars.LuaJScripting.CallLua'
-	 * is called in Lua in myScript.lua, this function is called.
-	 * This function in turn sets up all the functions that are interfaced between Lua and Java.
-	 * @param modName - module name
-	 * @param env
-	 * @return
-	 */
-	public LuaValue call(LuaValue modName, LuaValue env) {
-
-		Log.trace("calling {}", modName);
-		LuaValue library = tableOf();
-
-		// if you want to add functions, add them to the library
-		library.set("createUnit", new createUnit());
-		library.set("selectUnits", new selectUnits());
-		library.set("deselectUnits", new deselectUnits());
-		library.set("moveOrSpecialAction", new moveOrSpecialAction());
-		library.set("getLuaJGlobal", new getLuaJGlobal());
-		library.set("placeBuilding", new placeBuilding());
-		library.set("setUpBase", new setUpBase());
-		library.set("drawText", new drawText());
-		library.set("addPriority", new addPriority());
-		library.set("getTopPriority", new getTopPriority());
-		library.set("removeTopPriority", new removeTopPriority());
-		library.set("clearPriorities", new clearPriorities());
-
-
-		env.set("org.luawars.LuaJScripting.CallLua", library);
-
-		return library;
-	}
 
 	/**
 	 * initializes the lua global variable LUA_PATH which determines where Lua should look to open up Lua scripts
@@ -128,9 +97,7 @@ public class CallLua extends TwoArgFunction {
     * @return
     */
 
-    private static int pID = 0;
-
-	public static LuaValue runScript(String scriptFileName) {
+	public static void runScript(String scriptFileName, CallLua bitch) {
 		Log.trace("running script {}", scriptFileName);
 		try {
 			// to see how to use lua parser look at this
@@ -139,8 +106,8 @@ public class CallLua extends TwoArgFunction {
 			//System.out.println("Calling " + folderPath + scriptFileName);
 			LuaParser parser = new LuaParser(new FileInputStream(scriptFileName));
 			parser.Chunk();
-            G.set("playerID", pID++);
-			return G.loadFile(scriptFileName).call();
+            G.set("cuid", System.identityHashCode(bitch));
+			G.loadFile(scriptFileName).call();
 			// if we want our game to put anything, then put error message displays here
 		} catch(FileNotFoundException e) {
 			Log.error("FILE NOT FOUND: " + scriptFileName);
@@ -149,7 +116,6 @@ public class CallLua extends TwoArgFunction {
 		} catch(LuaError e) {
 			Log.error("LUA ERROR: " + e);
 		}
-		return NIL;
 	}
 
 	/**
@@ -219,166 +185,115 @@ public class CallLua extends TwoArgFunction {
 	 * NOTE: I ALSO MADE A SevenArgFunction class. You can use this if you need to create a function with more than
 	 * 3 arguments instead of using VarArgFunction.
 	 */
-	public static class createUnit extends TwoArgFunction {
-		public LuaValue call(LuaValue panelId, LuaValue buttonNum) {
-			Log.trace("calling createUnit function with panelId {}, buttonNum {}", panelId, buttonNum);
+	public static void createUnit(int panelId, int buttonNum) {
+        Log.trace("calling createUnit function with panelId {}, buttonNum {}", panelId, buttonNum);
 
-            Log.debug("player " + G.get("playerID") + " creating a unit: " + buttonNum);
+        Log.debug("player " + intToCallLua.get(G.get("cuid")) + " creating a unit: " + buttonNum);
 
-            // Lua's indices start at 1 instead of 0
-            // so I'm converting them into java indices
-            int actualPanelID = panelId.toint() - 1;
-            int actualbuttonNum = buttonNum.toint() - 1;
-			ArrayList<GuiPanel> panels = menu.getPanels();
-			if(actualPanelID >= 0 && actualPanelID < panels.size()){
+        // Lua's indices start at 1 instead of 0
+        // so I'm converting them into java indices
+        int actualPanelID = panelId - 1;
+        int actualbuttonNum = buttonNum - 1;
+        ArrayList<GuiPanel> panels = menu.getPanels();
+        if(actualPanelID >= 0 && actualPanelID < panels.size()){
 
-				ArrayList<GuiButton> buttons = panels.get(actualPanelID).getButtons();
-				if(actualbuttonNum >= 0 && actualbuttonNum < buttons.size()) {
-					Log.trace("creating unit {}", buttons.get(actualbuttonNum));
-					buttons.get(actualbuttonNum).launchCreateEntityProcess();
-				}
-				else {
-					Log.error("Attempted to use button outside of button size range.");
-				}
-			}
-			else {
-				Log.error("Attempted to use panel outside of panel size range.");
-			}
-			return NIL;
-		}
+            ArrayList<GuiButton> buttons = panels.get(actualPanelID).getButtons();
+            if(actualbuttonNum >= 0 && actualbuttonNum < buttons.size()) {
+                Log.trace("creating unit {}", buttons.get(actualbuttonNum));
+                buttons.get(actualbuttonNum).launchCreateEntityProcess();
+            }
+            else {
+                Log.error("Attempted to use button outside of button size range.");
+            }
+        }
+        else {
+            Log.error("Attempted to use panel outside of panel size range.");
+        }
 	}
 
-	public static class selectUnits extends SevenArgFunction {
-		// NOTE: THIS COULD MESS UP BECAUSE THERE ARE MULTIPLE UNITS THAT HAVE THE NAME BUILDER,
-		// LIKEWISE THERE ARE MULTIPLE UNITS WITH THE NAME SCOUT
-		public LuaValue call(LuaValue tileX, LuaValue tileY, LuaValue radius, LuaValue numUnits, LuaValue unitType, LuaValue NIL1, LuaValue NIL2) {
-			// make it return a list of the selected units
-			// right now selectUnitsAt returns an arraylist of active entities
-			// might need to convert them into a lua list
-			// if unit type is NIL, then make tempUnitType null,
-			// or if the unit name is provided then select that unit
-			String tempUnitType = unitType == NIL ? null : unitType.tojstring();
-			input.selectUnitsAt(tileX.toint(), tileY.toint(), radius.tofloat(), numUnits.toint(), tempUnitType);
-			return NIL;
-		}
+    // NOTE: THIS COULD MESS UP BECAUSE THERE ARE MULTIPLE UNITS THAT HAVE THE NAME BUILDER,
+    // LIKEWISE THERE ARE MULTIPLE UNITS WITH THE NAME SCOUT
+	public static void selectUnits(int tileX, int tileY, float radius, int numUnits, String unitType) {
+        // make it return a list of the selected units
+        // right now selectUnitsAt returns an arraylist of active entities
+        // might need to convert them into a lua list
+        // if unit type is NIL, then make tempUnitType null,
+        // or if the unit name is provided then select that unit
+        String tempUnitType = unitType == null ? null : unitType;
+        input.selectUnitsAt(tileX, tileY, radius, numUnits, tempUnitType);
 	}
 
-	public static class deselectUnits extends SevenArgFunction {
-		public LuaValue call(LuaValue NIL0, LuaValue NIL1, LuaValue NIL2, LuaValue NIL3, LuaValue NIL4, LuaValue NIL5, LuaValue NIL6) {
-			input.deselectUnits();
-			return NIL;
-		}
+	public static void deselectUnits() {
+        input.deselectUnits();
 	}
 
-	public static class moveOrSpecialAction extends TwoArgFunction {
-		// the lua version takes in tile coordinates
-		// however moveOrSpecialAction takes in x, y coordinates (i.e. pixel coordinates)
-		// so we need to convert the tiles to pixel coordinates
-		public LuaValue call(LuaValue tileX, LuaValue tileY) {
-			input.moveOrSpecialAction(tileX.toint() * Launch.g.getEngine().getTileW(), tileY.toint() * Launch.g.getEngine().getTileH());
-			return NIL;
-		}
+    // the lua version takes in tile coordinates
+    // however moveOrSpecialAction takes in x, y coordinates (i.e. pixel coordinates)
+    // so we need to convert the tiles to pixel coordinates
+	public static void moveOrSpecialAction(int tileX, int tileY) {
+        input.moveOrSpecialAction(tileX * Launch.g.getEngine().getTileW(), tileY * Launch.g.getEngine().getTileH());
 	}
 
 	/**
 	 * Returns a global variable for the player to use
 	 * Also updates all the global variables when called
 	 */
-	public static class getLuaJGlobal extends OneArgFunction {
-		public LuaValue call(LuaValue globalVarName) {
-			return NIL;
-		}
+	public static LuaJGlobal getLuaJGlobal() {
+		return intToCallLua.get(G.get("cuid")).global;
 	}
 
 	// right now it places the first building it finds (from the panels)
 	// even if you have both a building (from panel 0) and a wall (from panel 2) to place.
 	// I might need to extend it to use 4 arguments, panel and building, but for now, I'll leave it
-	public static class placeBuilding extends TwoArgFunction {
-		public LuaValue call(LuaValue xLoc, LuaValue yLoc) {
-			ArrayList<GuiPanel> panels = menu.getPanels();
-			OUTERLOOP:
-			for(GuiPanel panel : panels) {
-				ArrayList<GuiButton> buttons = panel.getButtons();
-				for(GuiButton button : buttons) {
-					if(button.placeBuilding(xLoc.toint(), yLoc.toint()))
-					{
-						break OUTERLOOP;
-					}
-				}
-			}
-			return NIL;
-		}
+	public static void placeBuilding(int xLoc, int yLoc) {
+        ArrayList<GuiPanel> panels = menu.getPanels();
+        OUTERLOOP:
+        for(GuiPanel panel : panels) {
+            ArrayList<GuiButton> buttons = panel.getButtons();
+            for(GuiButton button : buttons) {
+                if(button.placeBuilding(xLoc, yLoc))
+                {
+                    break OUTERLOOP;
+                }
+            }
+        }
+    }
+
+	public static void setUpBase() {
+        Log.debug("player " + G.get("playerID") + " setting up base");
+        input.setUpBase();
 	}
 
-	public static class setUpBase extends ZeroArgFunction {
-		public LuaValue call() {
-            Log.debug("player " + G.get("playerID") + " setting up base");
-			input.setUpBase();
-			return NIL;
-		}
+	public static void drawText(int xCoordinate, int yCoordinate, String text) {
+        Launch.g.getEngine().getContainer().getGraphics().drawString(text, xCoordinate, yCoordinate);
 	}
 
-	public static class drawText extends SevenArgFunction {
-		public LuaValue call(LuaValue xCoordinate, LuaValue yCoordinate, LuaValue text, LuaValue NIL0, LuaValue NIL1, LuaValue NIL2, LuaValue NIL3) {
-			Launch.g.getEngine().getContainer().getGraphics().drawString(text.tojstring(), xCoordinate.toint(), yCoordinate.toint());
-			return NIL;
-		}
+	public static void addPriority(LuaValue functionCall, LuaValue parameters, int priority) {
+        LuaJGlobal.AIpriorityQueue.add(new AIGamePriorities(functionCall, parameters, priority));
 	}
 
-	public static class addPriority extends SevenArgFunction {
-		public LuaValue call(LuaValue functionCall, LuaValue parameters, LuaValue priority, LuaValue NIL0, LuaValue NIL1, LuaValue NIL2, LuaValue NIL3) {
-			LuaJGlobal.AIpriorityQueue.add(new AIGamePriorities(functionCall, parameters, priority));
-			return NIL;
-		}
+	public static LuaValue removeTopPriority() {
+        LuaTable topPriority = null;
+        if(LuaJGlobal.AIpriorityQueue.size() > 0) {
+            topPriority = new LuaTable();
+            topPriority.set(0, LuaJGlobal.AIpriorityQueue.peek().myFunction);
+            topPriority.set(1, LuaJGlobal.AIpriorityQueue.peek().parameters);
+            LuaJGlobal.AIpriorityQueue.poll();
+        }
+        return topPriority != null ? topPriority : LuaValue.NIL;
 	}
 
-	public static class removeTopPriority extends ZeroArgFunction {
-		public LuaValue call() {
-			LuaTable topPriority = new LuaTable();
-			if(LuaJGlobal.AIpriorityQueue.size() > 0) {
-				topPriority.set(0, LuaJGlobal.AIpriorityQueue.peek().myFunction);
-				topPriority.set(1, LuaJGlobal.AIpriorityQueue.peek().parameters);
-				LuaJGlobal.AIpriorityQueue.poll();
-				return topPriority;
-			}
-			return NIL;
-		}
+	public static LuaValue getTopPriority() {
+        LuaTable topPriority = null;
+        if(LuaJGlobal.AIpriorityQueue.peek() != null) {
+            topPriority = new LuaTable();
+            topPriority.set(1, LuaJGlobal.AIpriorityQueue.peek().myFunction);
+            topPriority.set(2, LuaJGlobal.AIpriorityQueue.peek().parameters);
+        }
+        return topPriority != null ? topPriority : LuaValue.NIL;
 	}
 
-	public static class getTopPriority extends SevenArgFunction {
-		public LuaValue call(LuaValue NIL0, LuaValue NIL1, LuaValue NIL2, LuaValue NIL3, LuaValue NIL4, LuaValue NIL5, LuaValue NIL6) {
-			LuaTable topPriority = new LuaTable();
-			if(LuaJGlobal.AIpriorityQueue.peek() != null) {
-				topPriority.set(1, LuaJGlobal.AIpriorityQueue.peek().myFunction);
-				topPriority.set(2, LuaJGlobal.AIpriorityQueue.peek().parameters);
-				return topPriority;
-			}
-			else {
-				return NIL;
-			}
-
-		}
-	}
-
-//    public static class getAllPriorities extends SevenArgFunction {
-//        public LuaValue call(LuaValue NIL0, LuaValue NIL1, LuaValue NIL2, LuaValue NIL3, LuaValue NIL4, LuaValue NIL5, LuaValue NIL6) {
-//            LuaTable allPriorities = new LuaTable();
-//            int i = 0;
-//            for(AIGamePriorities p : LuaJGlobal.AIpriorityQueue) {
-//                LuaTable topPriority = new LuaTable();
-//                topPriority.set(0, LuaJGlobal.AIpriorityQueue.peek().myFunction);
-//                topPriority.set(1, LuaJGlobal.AIpriorityQueue.peek().parameters);
-//                i++;
-//                allPriorities.set(i, topPriority);
-//            }
-//            return allPriorities;
-//        }
-//    }
-
-	public static class clearPriorities extends SevenArgFunction {
-		public LuaValue call(LuaValue functionCall, LuaValue yCoordinate, LuaValue text, LuaValue NIL0, LuaValue NIL1, LuaValue NIL2, LuaValue NIL3) {
-			LuaJGlobal.AIpriorityQueue.clear();
-			return NIL;
-		}
+	public static void clearPriorities() {
+        LuaJGlobal.AIpriorityQueue.clear();
 	}
 }

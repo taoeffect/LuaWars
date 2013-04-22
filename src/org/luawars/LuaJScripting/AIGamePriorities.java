@@ -12,9 +12,9 @@ import org.luaj.vm2.LuaValue;
 public class AIGamePriorities implements Comparable<AIGamePriorities> {
     public LuaValue myFunction;
     public LuaValue parameters;
-    public LuaValue priority;
+    public int priority;
 
-    public AIGamePriorities(LuaValue myFunction, LuaValue parameters, LuaValue priority) {
+    public AIGamePriorities(LuaValue myFunction, LuaValue parameters, int priority) {
         this.myFunction = myFunction;
         this.parameters = parameters;
         this.priority = priority;
@@ -22,15 +22,15 @@ public class AIGamePriorities implements Comparable<AIGamePriorities> {
 
     @Override
     public int compareTo(AIGamePriorities o) {
-        if(this.priority.toint() > o.priority.toint())
+        if(this.priority > o.priority)
             return -1;
-        else if(this.priority.toint() < o.priority.toint())
+        else if(this.priority < o.priority)
             return 1;
         return 0;
     }
 
     @Override
     public String toString() {
-        return myFunction.tojstring() + "(" + parameters + ") " + priority.toint();
+        return myFunction.tojstring() + "(" + parameters + ") " + priority;
     }
 }
